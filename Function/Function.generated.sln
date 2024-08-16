@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.002.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RU_NO_CRM_Functions", "Function\RU_NO_CRM_Functions.csproj", "{923F2BF8-401D-41D8-8032-6B903EA6370E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RU_NO_CRM_Functions", "Function\RU_NO_CRM_Functions.csproj", "{FED3EBE8-57FB-41BB-878F-C1356A94101C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +11,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{923F2BF8-401D-41D8-8032-6B903EA6370E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{923F2BF8-401D-41D8-8032-6B903EA6370E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{923F2BF8-401D-41D8-8032-6B903EA6370E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{923F2BF8-401D-41D8-8032-6B903EA6370E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FED3EBE8-57FB-41BB-878F-C1356A94101C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FED3EBE8-57FB-41BB-878F-C1356A94101C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FED3EBE8-57FB-41BB-878F-C1356A94101C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FED3EBE8-57FB-41BB-878F-C1356A94101C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
