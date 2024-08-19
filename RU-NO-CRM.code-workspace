@@ -15,6 +15,7 @@
     },
     "omnisharp.dotNetCliPaths": [
       "C:\\Users\\lasfro\\.azurelogicapps\\dependencies\\DotNetSDK"
-    ]
+    ],
+    "azurite.location": "cdfcebe5-790c-4bbc-aa5b-e47cb710f8af"
   }
 }
