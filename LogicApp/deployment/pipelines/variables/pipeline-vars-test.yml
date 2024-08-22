@@ -1,0 +1,48 @@
+# IaC variables
+
+variables:
+  - group: CRMLibrary-test
+
+  - name: customStorageName
+    value: 'sanocrmtst'
+
+  - name: projectName
+    value: 'crm-accounts'
+
+  - name: prefix
+    value: 'no-core-test'
+
+  # Resource Group
+  - name: resourceGroupLocation
+    value: 'northeurope'
+
+  - name: resourceGroupName
+    value: 'rg-$(prefix)-$(projectName)'  
+
+  - name: sharedResourceGroup
+    value: 'rg-no-core-test-shared'
+  
+  - name: serviceBusResourceGroup
+    value: 'rg-no-core-test-sb'
+
+  #  Application Insights
+  - name: appInsightsName
+    value: 'ai-$(prefix)-$(projectName)'
+
+  #  Logic App
+  - name: logicAppName
+    value: 'la-$(prefix)-$(projectName)'
+
+  - name: localKeyVaultName
+    value: 'kv-no-test-crm-accounts'
+
+  - name: appServicePlanName
+    value: asp-la-no-core-test
+
+  # Service Bus
+  - name: sharedServiceBusName
+    value: 'sb-no-core-test'
+
+  # VNet
+  - name: vnetName
+    value: 'vnet-no-core-test'

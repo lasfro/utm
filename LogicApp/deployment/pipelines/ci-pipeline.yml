@@ -1,0 +1,102 @@
+trigger:
+- master
+
+pr: none
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+- template: variables/pipeline-vars-shared.yml
+
+- name: projects
+  value: '**/RU_NO_CRM_Functions.csproj'
+
+- name: buildConfiguration
+  value: 'Release'
+
+jobs:
+- job: logic_app_build
+  displayName: 'Build and publish logic app'
+  
+  steps:
+
+  - task: CopyFiles@2
+    displayName: 'Create project folder'
+    inputs:
+      SourceFolder: '$(System.DefaultWorkingDirectory)'
+      Contents: |
+        LogicApp/flows/**    
+      TargetFolder: 'project_output'
+
+  - task: CopyFiles@2
+    displayName: 'Create project folder'
+    inputs:
+      SourceFolder: '$(System.DefaultWorkingDirectory)/LogicApp'
+      Contents: |
+        artifacts/**
+      TargetFolder: 'project_output/LogicApp/flows/'
+
+  - task: CopyFiles@2
+    displayName: 'Create project folder'
+    inputs:
+      SourceFolder: '$(System.DefaultWorkingDirectory)'
+      Contents: |        
+        LogicApp/host.json
+        LogicApp/parameters.json
+      TargetFolder: 'project_output/LogicApp/flows'
+      flattenFolders: true
+  
+  #transform parameters file
+  - task: FileTransform@2
+    displayName: "Transform parameters.json"
+    inputs:
+      folderPath: 'project_output/LogicApp/flows'
+      xmlTransformationRules: ''
+      jsonTargetFiles: 'parameters.json'
+
+  #copy and rename connections file
+  - task: PowerShell@2
+    displayName: 'Copy Specific connections'
+    inputs:
+      targetType: inline
+      script: Copy-Item -Path "$(System.DefaultWorkingDirectory)/LogicApp/connections-cloud.json" -Destination "project_output/LogicApp/flows/connections.json"
+
+  - task: CopyFiles@2
+    displayName: 'Copy logic app flows to staging area'
+    inputs:
+      SourceFolder: "$(System.DefaultWorkingDirectory)/project_output/LogicApp/flows"
+      TargetFolder: "$(Build.ArtifactStagingDirectory)"
+      Contents: '**'
+
+  # build function app solution
+  - task: DotNetCoreCLI@2
+    displayName: 'build function app'
+    inputs:
+      command: build
+      projects: $(projects)
+      arguments: '--configuration $(buildConfiguration)'
+      configuration: $(buildConfiguration)
+
+  - task: CopyFiles@2
+    displayName: 'Copy function app build to staging area'
+    inputs:
+      SourceFolder: "$(System.DefaultWorkingDirectory)/Function/bin/$(buildConfiguration)"
+      TargetFolder: "$(Build.ArtifactStagingDirectory)/lib/custom"
+      Contents: '**'
+
+  - task: ArchiveFiles@2
+    displayName: 'Append function app to archive'
+    inputs:
+      rootFolderOrFile: '$(Build.ArtifactStagingDirectory)'
+      includeRootFolder: false
+      archiveType: 'zip'
+      archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+      replaceExistingArchive: true
+
+  - task: PublishPipelineArtifact@1
+    displayName: 'Publish project zip artifact'
+    inputs:
+      targetPath: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+      artifact: '$(logicAppCIArtifactName)'
+      publishLocation: 'pipeline'

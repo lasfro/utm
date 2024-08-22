@@ -1,0 +1,48 @@
+# IaC variables
+
+variables:
+  - group: CRMLibrary-prod
+
+  - name: customStorageName
+    value: 'sanocrmprd'
+
+  - name: projectName
+    value: 'crm-accounts'
+
+  - name: prefix
+    value: 'no-core-prod'
+
+  # Resource Group
+  - name: resourceGroupLocation
+    value: 'northeurope'
+
+  - name: resourceGroupName
+    value: 'rg-$(prefix)-$(projectName)'  
+
+  - name: sharedResourceGroup
+    value: 'rg-no-core-prod-shared'
+  
+  - name: serviceBusResourceGroup
+    value: 'rg-no-core-prod-sb'
+
+  #  Application Insights
+  - name: appInsightsName
+    value: 'ai-$(prefix)-$(projectName)'
+
+  #  Logic App
+  - name: logicAppName
+    value: 'la-$(prefix)-$(projectName)'
+
+  - name: localKeyVaultName
+    value: 'kv-no-prod-crm-accounts'
+
+  - name: appServicePlanName
+    value: asp-la-no-core-prod
+
+  # Service Bus
+  - name: sharedServiceBusName
+    value: 'sb-no-core-prod'
+
+  # VNet
+  - name: vnetName
+    value: 'vnet-no-core-prod'

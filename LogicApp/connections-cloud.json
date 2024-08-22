@@ -1,0 +1,53 @@
+{
+  "serviceProviderConnections": {
+    "keyvault": {
+      "parameterValues": {
+        "VaultUri": "@appsetting('keyVault_VaultUri')",
+        "authProvider": {
+          "Type": "ManagedServiceIdentity"
+        }
+      },
+      "parameterSetName": "ManagedServiceIdentity",
+      "serviceProvider": {
+        "id": "/serviceProviders/keyvault"
+      },
+      "displayName": "Keyvault"
+    },
+    "azuretables": {
+      "parameterValues": {
+        "connectionString": "@appsetting('CustomStorageTableConnectionString')"
+      },
+      "parameterSetName": "connectionString",
+      "serviceProvider": {
+        "id": "/serviceProviders/azuretables"
+      },
+      "displayName": "azuretables"
+    }
+  },
+  "managedApiConnections": {
+    "commondataservice_ref": {
+      "api": {
+        "id": "/subscriptions/@{appsetting('WORKFLOWS_SUBSCRIPTION_ID')}/providers/Microsoft.Web/locations/northeurope/managedApis/commondataservice"
+      },
+      "connection": {
+        "id": "/subscriptions/@{appsetting('WORKFLOWS_SUBSCRIPTION_ID')}/resourceGroups/@{appsetting('WORKFLOWS_RESOURCE_GROUP_NAME')}/providers/Microsoft.Web/connections/commondataservice"
+      },
+      "connectionRuntimeUrl": "@{appsetting('WORKFLOWS_COMMONDATASERVICE_CONNECTIONRUNTIME_URL')}",
+      "authentication": {
+        "type": "ManagedServiceIdentity"
+      }
+    },
+    "servicebus": {
+      "api": {
+        "id": "/subscriptions/@{appsetting('WORKFLOWS_SUBSCRIPTION_ID')}/providers/Microsoft.Web/locations/northeurope/managedApis/servicebus"
+      },
+      "connection": {
+        "id": "/subscriptions/@{appsetting('WORKFLOWS_SUBSCRIPTION_ID')}/resourceGroups/@{appsetting('WORKFLOWS_RESOURCE_GROUP_NAME')}/providers/Microsoft.Web/connections/servicebus"
+      },
+      "connectionRuntimeUrl": "@{appsetting('WORKFLOWS_SERVICEBUS_CONNECTIONRUNTIME_URL')}",
+      "authentication": {
+        "type": "ManagedServiceIdentity"
+      }
+    }
+  }
+}

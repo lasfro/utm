@@ -1,0 +1,6 @@
+{
+    "Dataverse_environment": {
+    "type": "String",
+    "value": "@appsetting('Dataverse_environment')"
+  }
+}
