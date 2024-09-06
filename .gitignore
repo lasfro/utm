@@ -3,3 +3,4 @@ Function/bin/*
 Function/obj/*
 Function/obj/Debug/net8/RU_NO_CRM_Functions.assets.cache
 Function/obj/project.nuget.cache
+Function/.vs/*

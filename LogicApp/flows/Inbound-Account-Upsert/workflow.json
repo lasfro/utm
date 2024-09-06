@@ -5,10 +5,26 @@
             "Call_a_local_function_in_this_logic_app": {
                 "type": "InvokeFunction",
                 "inputs": {
-                    "functionName": "RU_NO_CRM_Functions",
+                    "functionName": "MapToInboundModelDistinctAccountFlatStructure",
                     "parameters": {
-                        "zipCode": 2323,
-                        "temperatureScale": "2"
+                        "requestMessage": {
+                            "Items": [
+                                {
+                                    "ContentData": "W3sKICAgICJBY2NvdW50SWQiOiAiMTIzNDU2IiwKICAgICJOYW1lIjogIkNvbXBhbnkgbmFtZSIsCiAgICAiVHNMb3BlbnVtbWVyIjogIjEyMzQiCn0KXQ==",
+                                    "ContentType": "application/json",
+                                    "ContentTransferEncoding": "Base64",
+                                    "MessageId": "85dbebc1-a82d-4650-8280-c6ac7cde6674",
+                                    "LockToken": "85dbebc1-a82d-4650-8280-c6ac7cde6674"
+                                },
+                                {
+                                    "ContentData": "W3sKICAgICJBY2NvdW50SWQiOiAiMTIzNDU2IiwKICAgICJOYW1lIjogIkNvbXBhbnkgbmFtZSIsCiAgICAiVHNMb3BlbnVtbWVyIjogIjEyMzQiCn0KXQ==",
+                                    "ContentType": "application/json",
+                                    "ContentTransferEncoding": "Base64",
+                                    "MessageId": "00dbebc1-a82d-4650-8280-c6ac7cde6600",
+                                    "LockToken": "00dbebc1-a82d-4650-8280-c6ac7cde6600"
+                                }
+                            ]
+                        }
                     }
                 },
                 "runAfter": {}

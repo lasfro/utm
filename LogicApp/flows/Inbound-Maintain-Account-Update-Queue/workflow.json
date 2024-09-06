@@ -1,0 +1,169 @@
+{
+    "definition": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "actions": {
+            "Get_messages_from_a_queue_(peek-lock)": {
+                "type": "ApiConnection",
+                "inputs": {
+                    "host": {
+                        "connection": {
+                            "referenceName": "servicebus"
+                        }
+                    },
+                    "method": "get",
+                    "path": "/@{encodeURIComponent(encodeURIComponent('crmaccounts'))}/messages/batch/peek",
+                    "queries": {
+                        "queueType": "Main",
+                        "sessionId": "",
+                        "maxMessageCount": 20
+                    }
+                },
+                "runAfter": {}
+            },
+            "Call_a_local_function_-_process_items_-_remove_duplicates": {
+                "type": "InvokeFunction",
+                "inputs": {
+                    "functionName": "MapToInboundModelDistinctAccountFlatStructure",
+                    "parameters": {
+                        "requestMessage": {
+                            "Items": "@body('Get_messages_from_a_queue_(peek-lock)')"
+                        }
+                    }
+                },
+                "runAfter": {
+                    "For_each_-_Log_account_transactions": [
+                        "SUCCEEDED"
+                    ]
+                }
+            },
+            "For_each_processed_account": {
+                "type": "foreach",
+                "foreach": "@outputs('Call_a_local_function_-_process_items_-_remove_duplicates')?['body']?['Items']",
+                "actions": {
+                    "Condition_-_valid_item": {
+                        "type": "If",
+                        "expression": {
+                            "and": [
+                                {
+                                    "equals": [
+                                        "@items('For_each_processed_account')?['MessageValid']",
+                                        true
+                                    ]
+                                }
+                            ]
+                        },
+                        "actions": {
+                            "Insert_or_Update_Entity": {
+                                "type": "ServiceProvider",
+                                "inputs": {
+                                    "parameters": {
+                                        "tableName": "InboundAccountsQueue",
+                                        "entity": {
+                                            "PartitionKey": "Default",
+                                            "RowKey": "@{items('For_each_processed_account')?['Account']?['AccountId']}",
+                                            "NextRunTime": "@utcNow()",
+                                            "ContentBase64": "@{base64(items('For_each_processed_account')?['Account'])}",
+                                            "RetryCount": 0,
+                                            "ServiceBusMessageId": "@{items('For_each_processed_account')?['MessageId']}",
+                                            "InboundMaintainAccountUpdateQueueWorkflowid": "@{workflow()['run']['name']}",
+                                            "InboundAccountsSyncWorkflowId": "",
+                                            "InboundAccountsUpsertWorkflowId": ""
+                                        }
+                                    },
+                                    "serviceProviderConfiguration": {
+                                        "connectionName": "azuretables",
+                                        "operationId": "upsertEntity",
+                                        "serviceProviderId": "/serviceProviders/azureTables"
+                                    }
+                                }
+                            }
+                        },
+                        "else": {
+                            "actions": {}
+                        }
+                    }
+                },
+                "runAfter": {
+                    "Call_a_local_function_-_process_items_-_remove_duplicates": [
+                        "SUCCEEDED"
+                    ]
+                }
+            },
+            "For_each_service_bus_message": {
+                "type": "Foreach",
+                "foreach": "@body('Get_messages_from_a_queue_(peek-lock)')",
+                "actions": {
+                    "Complete_the_message_in_a_queue": {
+                        "type": "ApiConnection",
+                        "inputs": {
+                            "host": {
+                                "connection": {
+                                    "referenceName": "servicebus"
+                                }
+                            },
+                            "method": "delete",
+                            "path": "/@{encodeURIComponent(encodeURIComponent('crmaccounts'))}/messages/complete",
+                            "queries": {
+                                "lockToken": "@items('For_each_service_bus_message')?['LockToken']",
+                                "queueType": "Main",
+                                "sessionId": ""
+                            }
+                        }
+                    }
+                },
+                "runAfter": {
+                    "For_each_processed_account": [
+                        "SUCCEEDED"
+                    ]
+                }
+            },
+            "For_each_-_Log_account_transactions": {
+                "type": "Foreach",
+                "foreach": "@body('Get_messages_from_a_queue_(peek-lock)')",
+                "actions": {
+                    "Log_product_transaction": {
+                        "type": "ServiceProvider",
+                        "inputs": {
+                            "parameters": {
+                                "tableName": "InboundAccountsTransactionLog",
+                                "entity": {
+                                    "PartitionKey": "Default",
+                                    "RowKey": "@{items('For_each_-_Log_account_transactions')?['MessageId']}",
+                                    "ServiceBusMessageId": "@{items('For_each_-_Log_account_transactions')?['MessageId']}",
+                                    "InboundMaintainAccountUpdateQueueWorkflowid": "@{workflow()['run']['name']}"
+                                }
+                            },
+                            "serviceProviderConfiguration": {
+                                "connectionName": "azuretables",
+                                "operationId": "upsertEntity",
+                                "serviceProviderId": "/serviceProviders/azureTables"
+                            }
+                        }
+                    }
+                },
+                "runAfter": {
+                    "Get_messages_from_a_queue_(peek-lock)": [
+                        "SUCCEEDED"
+                    ]
+                }
+            }
+        },
+        "contentVersion": "1.0.0.0",
+        "outputs": {},
+        "triggers": {
+            "Recurrence": {
+                "type": "Recurrence",
+                "recurrence": {
+                    "interval": 1,
+                    "frequency": "Minute"
+                },
+                "runtimeConfiguration": {
+                    "concurrency": {
+                        "runs": 1
+                    }
+                }
+            }
+        }
+    },
+    "kind": "Stateful"
+}

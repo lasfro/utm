@@ -103,6 +103,7 @@ resource appSettings 'Microsoft.Web/sites/config@2022-09-01' = {
     DynamicsCrmDirectoryId: '@Microsoft.KeyVault(SecretUri=${vaultUri}secrets/DynamicsCrmDirectoryId/)'
     DynamicsCrmEnvironmentUri: '@Microsoft.KeyVault(SecretUri=${vaultUri}secrets/DynamicsCrmEnvironmentUri/)'
     Dataverse_environment: dynamicsCrmEnvironmentUri
+    CustomStorageTableConnectionString: '@Microsoft.KeyVault(SecretUri=${vaultUri}secrets/CustomStorageTableConnectionString/)'
   }
 }
 
@@ -129,12 +130,12 @@ resource storageaccountCustom_tableService_HashesTable 'Microsoft.Storage/storag
 }
 
 resource storageaccountCustom_tableService_table_product_transaction_log 'Microsoft.Storage/storageAccounts/tableServices/tables@2021-08-01' = {
-  name: 'InboundCustomerTransactionLog'  
+  name: 'InboundAccountsTransactionLog'  
   parent: storageaccountCustom_tableService
 }
 
 resource storageaccount_tableService_table_inbound_products_queue 'Microsoft.Storage/storageAccounts/tableServices/tables@2021-08-01' = {
-  name: 'InboundCustomersQueue'  
+  name: 'InboundAccountsQueue'  
   parent: storageaccountCustom_tableService
 }
 

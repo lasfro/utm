@@ -1,3 +1,36 @@
 {
-  "managedApiConnections": {}
+  "managedApiConnections": {
+    "servicebus": {
+      "api": {
+        "id": "/subscriptions/@{appsetting('WORKFLOWS_SUBSCRIPTION_ID')}/providers/Microsoft.Web/locations/@{appsetting('WORKFLOWS_LOCATION_NAME')}/managedApis/servicebus"
+      },
+      "connection": {
+        "id": "/subscriptions/@{appsetting('WORKFLOWS_SUBSCRIPTION_ID')}/resourceGroups/@{appsetting('WORKFLOWS_RESOURCE_GROUP_NAME')}/providers/Microsoft.Web/connections/servicebus"
+      },
+      "connectionRuntimeUrl": "@parameters('servicebus-ConnectionRuntimeUrl')",
+      "authentication": "@parameters('servicebus-Authentication')"
+    },
+    "commondataservice": {
+      "api": {
+        "id": "/subscriptions/@{appsetting('WORKFLOWS_SUBSCRIPTION_ID')}/providers/Microsoft.Web/locations/@{appsetting('WORKFLOWS_LOCATION_NAME')}/managedApis/commondataservice"
+      },
+      "connection": {
+        "id": "/subscriptions/@{appsetting('WORKFLOWS_SUBSCRIPTION_ID')}/resourceGroups/@{appsetting('WORKFLOWS_RESOURCE_GROUP_NAME')}/providers/Microsoft.Web/connections/commondataservice"
+      },
+      "connectionRuntimeUrl": "@parameters('commondataservice-ConnectionRuntimeUrl')",
+      "authentication": "@parameters('commondataservice-Authentication')"
+    }
+  },
+  "serviceProviderConnections": {
+    "azuretables": {
+      "parameterValues": {
+        "connectionString": "@appsetting('azureTables_connectionString')"
+      },
+      "parameterSetName": "connectionString",
+      "serviceProvider": {
+        "id": "/serviceProviders/azureTables"
+      },
+      "displayName": "azuretable"
+    }
+  }
 }

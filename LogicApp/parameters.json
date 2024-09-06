@@ -1,0 +1,46 @@
+{
+  "Dataverse_environment": {
+    "type": "String",
+    "value": "@appsetting('Dataverse_environment')"
+  },
+  "CpiAccessTokenUrl": {
+    "type": "String",
+    "value": "@appsetting('CpiAccessTokenUrl')"
+  },
+  "CpiCreateCustomerClientId": {
+    "type": "String",
+    "value": "@appsetting('CpiCreateCustomerClientId')"
+  },
+  "CpiCreateCustomerClientSecret": {
+    "type": "String",
+    "value": "@appsetting('CpiCreateCustomerClientSecret')"
+  },
+  "servicebus-ConnectionRuntimeUrl": {
+    "type": "String",
+    "value": "@appsetting('servicebus-ConnectionRuntimeUrl')"
+  },
+  "CpiCreateCustomerUrl": {
+    "type": "String",
+    "value": "@appsetting('CpiCreateCustomerUrl')"
+  },
+  "servicebus-Authentication": {
+    "type": "Object",
+    "value": {
+      "type": "Raw",
+      "scheme": "Key",
+      "parameter": "@appsetting('servicebus-connectionKey')"
+    }
+  },
+  "commondataservice-ConnectionRuntimeUrl": {
+    "type": "String",
+    "value": "@appsetting('commondataservice-ConnectionRuntimeUrl')"
+  },
+  "commondataservice-Authentication": {
+    "type": "Object",
+    "value": {
+      "type": "Raw",
+      "scheme": "Key",
+      "parameter": "@appsetting('commondataservice-connectionKey')"
+    }
+  }
+}

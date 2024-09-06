@@ -43,10 +43,10 @@ jobs:
               -localKeyVaultName $(localKeyVaultName)              
               -vnetName $(vnetName)
               -dynamicsCrmEnvironmentUri $(dynamicsEnvironmentUri)
-              -dynamicsCrmSecret $(dynamicsCrmSecret)
-              -dynamicsCrmClientId $(dynamicsCrmClientId)
-              -dynamicsCrmDirectoryId $(dynamicsCrmDirectoryId)
-              -dynamicsCrmEnvironmentUri $(dynamicsCrmEnvironmentUri)
+              -dynamicsCrmSecret $(dynamicsSecret)
+              -dynamicsCrmClientId $(dynamicsClientId)
+              -dynamicsCrmDirectoryId $(dynamicsDirectoryId)
+              -dynamicsCrmEnvironmentUri $(dynamicsEnvironmentUri)
               -dataverseObjectId $(dataverseObjectId)
               -apimManagedIdentityId $(apimManagedIdentityId)
               -customStorageName $(customStorageName)'
@@ -130,14 +130,14 @@ jobs:
             addSpnToEnvironment: true
             useGlobalConfig: true
 
-        # # update app settings
-        # - task: AzureCLI@2
-        #   inputs:
-        #     azureSubscription: ${{ parameters.serviceConnection }}
-        #     scriptType: 'bash'
-        #     scriptLocation: 'inlineScript'
-        #     inlineScript: |
-        #       az functionapp config appsettings set --name $(LAname) --resource-group  $(resourceGroupName) --settings WORKFLOWS_SERVICEBUS_CONNECTIONRUNTIME_URL=$(serviceBusConnectionRuntimeUrl) WORKFLOWS_KEYVAULT_CONNECTIONRUNTIME_URL=$(keyvaultConnectionRuntimeUrl) WORKFLOWS_COMMONDATASERVICE_CONNECTIONRUNTIME_URL=$(commondataserviceConnectionRuntimeUrl) 
-        #     #WORKFLOWS_AZURETABLES_CONNECTIONRUNTIME_URL=$(azuretablesConnectionRuntimeUrl) 
-        #     addSpnToEnvironment: true
-        #     useGlobalConfig: true
+        # update app settings
+        - task: AzureCLI@2
+          inputs:
+            azureSubscription: ${{ parameters.serviceConnection }}
+            scriptType: 'bash'
+            scriptLocation: 'inlineScript'
+            inlineScript: |
+              az functionapp config appsettings set --name $(LAname) --resource-group  $(resourceGroupName) --settings WORKFLOWS_SERVICEBUS_CONNECTIONRUNTIME_URL=$(serviceBusConnectionRuntimeUrl) WORKFLOWS_KEYVAULT_CONNECTIONRUNTIME_URL=$(keyvaultConnectionRuntimeUrl) WORKFLOWS_COMMONDATASERVICE_CONNECTIONRUNTIME_URL=$(commondataserviceConnectionRuntimeUrl) 
+            #WORKFLOWS_AZURETABLES_CONNECTIONRUNTIME_URL=$(azuretablesConnectionRuntimeUrl) 
+            addSpnToEnvironment: true
+            useGlobalConfig: true
