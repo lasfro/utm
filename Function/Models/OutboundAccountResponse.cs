@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text.Json.Serialization;
 
 namespace RU_NO_CRM_Functions.Models
 {
@@ -7,7 +6,7 @@ namespace RU_NO_CRM_Functions.Models
     {
         public string? AccountNumber { get; set; }
         public string? TradesolutionLopenummer { get; set; }
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
         public string? EmailAddress1 { get; set; }
         public string? EmailAddress2 { get; set; }
         public string? EmailAddress3 { get; set; }

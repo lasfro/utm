@@ -60,7 +60,7 @@
                 },
                 "runAfter": {}
             },
-            "Call_a_local_function_in_this_logic_app": {
+            "Call_a_local_function_-_get_soap_content": {
                 "type": "InvokeFunction",
                 "inputs": {
                     "functionName": "MapToXmlOutboundModel",
@@ -70,15 +70,6 @@
                 },
                 "runAfter": {
                     "Call_a_local_function_-_map_to_outbound_model": [
-                        "SUCCEEDED"
-                    ]
-                }
-            },
-            "Compose_-_soap_header": {
-                "type": "Compose",
-                "inputs": "<?xml version=\"1.0\"?>\n<soap:Envelope\nxmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\"\nsoap:encodingStyle=\"http://www.w3.org/2003/05/soap-encoding\">\n\n<soap:Body>\n@{base64ToString(body('Call_a_local_function_in_this_logic_app')?['Base64Data'])}\n</soap:Body>\n\n</soap:Envelope>",
-                "runAfter": {
-                    "Call_a_local_function_in_this_logic_app": [
                         "SUCCEEDED"
                     ]
                 }
@@ -95,13 +86,18 @@
                     }
                 },
                 "runAfter": {
-                    "Compose_-_soap_header": [
+                    "Call_a_local_function_-_get_soap_content": [
                         "SUCCEEDED"
                     ]
                 },
                 "runtimeConfiguration": {
                     "contentTransfer": {
                         "transferMode": "Chunked"
+                    },
+                    "secureData": {
+                        "properties": [
+                            "inputs"
+                        ]
                     }
                 }
             },
@@ -114,7 +110,7 @@
                         "Authorization": "Bearer @{body('HTTP_-_get_access_token')?['access_token']}",
                         "Content-Type": "application/soap+xml"
                     },
-                    "body": "@outputs('Compose_-_soap_header')"
+                    "body": "@\r\nbase64ToString(body('Call_a_local_function_-_get_soap_content')?['Base64Data'])"
                 },
                 "runAfter": {
                     "HTTP_-_get_access_token": [

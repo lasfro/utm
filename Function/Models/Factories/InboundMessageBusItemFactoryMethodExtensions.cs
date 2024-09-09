@@ -19,7 +19,7 @@ namespace RU_NO_CRM_Functions.Models.Factories
             
             var result = System.Text.Json.JsonSerializer.Deserialize<List<InboundAccount>>(decodedContent);
 
-            return result;
+            return result?? [];
         }
     }
 }

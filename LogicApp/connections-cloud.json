@@ -25,7 +25,7 @@
     }
   },
   "managedApiConnections": {
-    "commondataservice_ref": {
+    "commondataservice": {
       "api": {
         "id": "/subscriptions/@{appsetting('WORKFLOWS_SUBSCRIPTION_ID')}/providers/Microsoft.Web/locations/northeurope/managedApis/commondataservice"
       },

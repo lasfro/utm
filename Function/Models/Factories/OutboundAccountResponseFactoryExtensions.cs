@@ -119,12 +119,12 @@ namespace RU_NO_CRM_Functions.Models.Factories
 
         private static Bapiad1vl CreateAddress(OutboundAccountResponse res)
         {
-            var addressInfo = AddressHelperService.SplitStreetAndHouseNumber(res.Address1Line1);
+            var addressInfo = AddressHelperService.SplitStreetAndHouseNumber(res.Address1Line1??"");
             //todo: look at address mapping
             return new Bapiad1vl
             {
                 Country = "NO",
-                Langu = "NO",
+                Langu = "O",  // key in SAP, must be make sure it is the same across all environments
                 City = res.Address1City,
                 County = res.Address1County,
                 Name = res.Name,

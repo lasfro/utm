@@ -25,6 +25,11 @@ param dynamicsCrmSecret string
 param dynamicsCrmClientId string
 param dynamicsCrmDirectoryId string
 param dynamicsCrmEnvironmentUri string
+param cpiCreateCustomerUrl string
+param cpiCreateCustomerClientId string
+param cpiAccessTokenUrl string
+@secure()
+param cpiCreateCustomerClientSecret string
 
 // generic variables
 var ResourceGroup = resourceGroup().location
@@ -102,6 +107,10 @@ resource appSettings 'Microsoft.Web/sites/config@2022-09-01' = {
     DynamicsCrmClientId: '@Microsoft.KeyVault(SecretUri=${vaultUri}secrets/DynamicsCrmClientId/)'
     DynamicsCrmDirectoryId: '@Microsoft.KeyVault(SecretUri=${vaultUri}secrets/DynamicsCrmDirectoryId/)'
     DynamicsCrmEnvironmentUri: '@Microsoft.KeyVault(SecretUri=${vaultUri}secrets/DynamicsCrmEnvironmentUri/)'
+    CpiCreateCustomerClientId: '@Microsoft.KeyVault(SecretUri=${vaultUri}secrets/CpiCreateCustomerClientId/)'
+    CpiCreateCustomerClientSecret: '@Microsoft.KeyVault(SecretUri=${vaultUri}secrets/CpiCreateCustomerClientSecret/)'
+    CpiCreateCustomerUrl: '@Microsoft.KeyVault(SecretUri=${vaultUri}secrets/CpiCreateCustomerUrl/)'
+    CpiAccessTokenUrl: '@Microsoft.KeyVault(SecretUri=${vaultUri}secrets/CpiAccessTokenUrl/)'
     Dataverse_environment: dynamicsCrmEnvironmentUri
     CustomStorageTableConnectionString: '@Microsoft.KeyVault(SecretUri=${vaultUri}secrets/CustomStorageTableConnectionString/)'
   }
@@ -211,6 +220,39 @@ resource customStorageTableConnectionStringSecret 'Microsoft.KeyVault/vaults/sec
   name: 'CustomStorageTableConnectionString'
   properties: {
     value: 'DefaultEndpointsProtocol=https;AccountName=${customStorageName};AccountKey=${listKeys(customStorageAccountid,'2015-05-01-preview').key1}${endpointSuffix}'
+  }
+}
+
+
+resource cpiCreateCustomerClientIdSecret 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
+  parent: kv
+  name: 'CpiCreateCustomerClientId'
+  properties: {
+    value: cpiCreateCustomerClientId
+  }
+}
+
+resource cpiCreateCustomerClientSecretSecret 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
+  parent: kv
+  name: 'CpiCreateCustomerClientSecret'
+  properties: {
+    value: cpiCreateCustomerClientSecret
+  }
+}
+
+resource cpiCreateCustomerUrlSecret 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
+  parent: kv
+  name: 'CpiCreateCustomerUrl'
+  properties: {
+    value: cpiCreateCustomerUrl
+  }
+}
+
+resource cpiAccessTokenUrlSecret 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
+  parent: kv
+  name: 'CpiAccessTokenUrl'
+  properties: {
+    value: cpiAccessTokenUrl
   }
 }
 

@@ -18,7 +18,7 @@ resources:
     source: 'ru-no-crm-accounts - ci'
     trigger:
       branches:
-      - master
+      - main
 
 stages:
 - stage: DEV

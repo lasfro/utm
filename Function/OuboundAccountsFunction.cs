@@ -37,8 +37,10 @@ public class OutboundAccountsFunction(ILoggerFactory loggerFactory)
         var nonXmlResponseData = requestMessage.ToOutboundAccount();
         var xmlResponseData = nonXmlResponseData.ToXmlCreateCustomerRequest();
 
-        var serializer = new XmlSerializer(typeof(ZfmCustomerMasterCreate));
-
+        var serializer = new XmlSerializer(typeof(CustomerCreateSoapEnvelope));
+        XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
+        ns.Add("urn", "urn:sap-com:document:sap:soap:functions:mc-style");
+        ns.Add("soapenv", "http://schemas.xmlsoap.org/soap/envelope/");
 
         var settings = new XmlWriterSettings
         {
@@ -49,8 +51,12 @@ public class OutboundAccountsFunction(ILoggerFactory loggerFactory)
 
         using var textWriter = new StringWriter();
         using var xmlWriter = XmlWriter.Create(textWriter, settings);
-        
-        serializer.Serialize(xmlWriter, xmlResponseData);
+
+        var envelope = new CustomerCreateSoapEnvelope();
+        envelope.Body = new Body();
+        envelope.Body.Content = xmlResponseData;
+
+        serializer.Serialize(xmlWriter, envelope, ns);
 
         var bytes = Encoding.UTF8.GetBytes(textWriter.ToString());
 

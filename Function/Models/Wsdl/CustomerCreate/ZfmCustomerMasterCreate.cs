@@ -1,4 +1,6 @@
 ﻿#nullable disable
+using System.Xml.Serialization;
+
 namespace RU_NO_CRM_Functions.Models.Wsdl.CustomerCreate;
 
 /// <remarks/>
@@ -19,6 +21,7 @@ public partial class ZfmCustomerMasterCreate
     private string testRunField;
 
     /// <remarks/>
+    //[System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
     [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
     public ZsiCmdCentralData CentralData
     {

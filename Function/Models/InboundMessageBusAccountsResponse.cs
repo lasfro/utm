@@ -11,6 +11,6 @@ public record InboundMessageBusAccountsResponseItem(
     string MessageId,
     Guid LockToken,
     bool MessageValid,
-    string ErrorMessage,
+    string? ErrorMessage,
     List<InboundAccount> Accounts
 );

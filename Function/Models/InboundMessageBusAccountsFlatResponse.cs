@@ -11,6 +11,6 @@ public record InboundMessageBusAccountsFlatResponseItem(
     string MessageId,
     Guid LockToken,
     bool MessageValid,
-    string ErrorMessage,
+    string? ErrorMessage,
     InboundAccount Account
 );

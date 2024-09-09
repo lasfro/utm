@@ -7,7 +7,7 @@
             return new OutboundAccountResponse()
             {
                 AccountNumber = accountRequestMessage.accountnumber,
-                Name = accountRequestMessage.name,
+                Name = accountRequestMessage.name ?? "",
                 TradesolutionLopenummer = accountRequestMessage.hbb_tradesolution_lopenummer,
                 //PreviouseTradesolutionLopenummer = accountRequestMessage.hbb_previous_tradesolution_lopenummer,  column does not exist yet
                 EmailAddress1 = accountRequestMessage.emailaddress1,

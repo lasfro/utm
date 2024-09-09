@@ -48,6 +48,10 @@ jobs:
               -dynamicsCrmDirectoryId $(dynamicsDirectoryId)
               -dynamicsCrmEnvironmentUri $(dynamicsEnvironmentUri)
               -dataverseObjectId $(dataverseObjectId)
+              -cpiCreateCustomerClientId $(cpiCreateCustomerClientId)
+              -cpiCreateCustomerClientSecret $(cpiCreateCustomerClientSecret)
+              -cpiCreateCustomerUrl $(cpiCreateCustomerUrl)
+              -cpiAccessTokenUrl $(cpiAccessTokenUrl)
               -apimManagedIdentityId $(apimManagedIdentityId)
               -customStorageName $(customStorageName)'
 
