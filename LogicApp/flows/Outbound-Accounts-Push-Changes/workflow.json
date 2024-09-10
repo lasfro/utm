@@ -108,7 +108,7 @@
                     "method": "POST",
                     "headers": {
                         "Authorization": "Bearer @{body('HTTP_-_get_access_token')?['access_token']}",
-                        "Content-Type": "application/soap+xml"
+                        "Content-Type": "text/xml"
                     },
                     "body": "@\r\nbase64ToString(body('Call_a_local_function_-_get_soap_content')?['Base64Data'])"
                 },
