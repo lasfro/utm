@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace RU_NO_CRM_Functions.Models
+namespace RU_NO_CRM_Functions.Models.Outbound
 {
     public class OutboundAccountResponse
     {

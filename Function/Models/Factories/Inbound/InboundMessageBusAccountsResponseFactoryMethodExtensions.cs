@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using Microsoft.VisualBasic.CompilerServices;
+using RU_NO_CRM_Functions.Models.Inbound;
+using RU_NO_CRM_Functions.Models.Inbound.Responses;
 
-namespace RU_NO_CRM_Functions.Models.Factories
+namespace RU_NO_CRM_Functions.Models.Factories.Inbound
 {
     public static class InboundMessageBusAccountsResponseFactoryMethodExtensions
     {

@@ -86,7 +86,7 @@
                     }
                 },
                 "runAfter": {
-                    "Call_a_local_function_-_get_soap_content": [
+                    "Add_a_new_row_(preview)": [
                         "SUCCEEDED"
                     ]
                 },
@@ -121,6 +121,29 @@
                     "contentTransfer": {
                         "transferMode": "Chunked"
                     }
+                }
+            },
+            "Add_a_new_row_(preview)": {
+                "type": "ApiConnection",
+                "inputs": {
+                    "host": {
+                        "connection": {
+                            "referenceName": "commondataservice"
+                        }
+                    },
+                    "method": "post",
+                    "body": "@parameters('Dummy')",
+                    "headers": {
+                        "prefer": "return=representation,odata.include-annotations=*",
+                        "organization": "@parameters('Dataverse_environment')",
+                        "Content-Type": "application/json"
+                    },
+                    "path": "/api/data/v9.1/@{encodeURIComponent(encodeURIComponent('accounts'))}"
+                },
+                "runAfter": {
+                    "Call_a_local_function_-_get_soap_content": [
+                        "SUCCEEDED"
+                    ]
                 }
             }
         },

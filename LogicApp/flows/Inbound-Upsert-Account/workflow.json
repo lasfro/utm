@@ -1,0 +1,958 @@
+{
+    "definition": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "actions": {
+            "Initialize_variable_-_context": {
+                "type": "InitializeVariable",
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "CallerContext",
+                            "type": "string",
+                            "value": "@triggerOutputs()?['headers']?['import-context']"
+                        }
+                    ]
+                },
+                "runAfter": {}
+            },
+            "Switch_-_get_correct_customer_filter_based_on_context": {
+                "type": "Switch",
+                "expression": "@variables('CallerContext')",
+                "default": {
+                    "actions": {
+                        "Terminate": {
+                            "type": "Terminate",
+                            "inputs": {
+                                "runStatus": "Failed",
+                                "runError": {
+                                    "code": "400"
+                                }
+                            },
+                            "runAfter": {
+                                "Response_no_import_context_set": [
+                                    "SUCCEEDED"
+                                ]
+                            }
+                        },
+                        "Response_no_import_context_set": {
+                            "type": "Response",
+                            "kind": "Http",
+                            "inputs": {
+                                "statusCode": 400
+                            }
+                        }
+                    }
+                },
+                "cases": {
+                    "Case_SAP": {
+                        "actions": {
+                            "Set_variable_-_filter_customer_SAP_id": {
+                                "type": "SetVariable",
+                                "inputs": {
+                                    "name": "AccountLookupFilter",
+                                    "value": "hbb_sapkundenummer eq '@{triggerBody()?['CustomerNo']}' or (hbb_sapkundenummer eq null and hbb_tradesolution_lopenummer = '@{triggerBody()?['TradesolutionId']}')"
+                                },
+                                "runAfter": {
+                                    "Condition_-_ensure_sap_customer_number_not_empty": [
+                                        "SUCCEEDED"
+                                    ]
+                                }
+                            },
+                            "Condition_-_ensure_sap_customer_number_not_empty": {
+                                "type": "If",
+                                "expression": {
+                                    "and": [
+                                        {
+                                            "equals": [
+                                                "@empty(triggerBody()?['CustomerNo'])",
+                                                true
+                                            ]
+                                        }
+                                    ]
+                                },
+                                "actions": {
+                                    "Terminate_customerno_not_set": {
+                                        "type": "Terminate",
+                                        "inputs": {
+                                            "runStatus": "Failed",
+                                            "runError": {
+                                                "code": "400"
+                                            }
+                                        },
+                                        "runAfter": {
+                                            "Response_no_sap_customerno_set": [
+                                                "SUCCEEDED"
+                                            ]
+                                        }
+                                    },
+                                    "Response_no_sap_customerno_set": {
+                                        "type": "Response",
+                                        "kind": "Http",
+                                        "inputs": {
+                                            "statusCode": 400
+                                        }
+                                    }
+                                },
+                                "else": {
+                                    "actions": {
+                                        "Set_variable_hash_partition_key_SAP": {
+                                            "type": "SetVariable",
+                                            "inputs": {
+                                                "name": "HashPartitionKey",
+                                                "value": "SAPUpdateHash"
+                                            }
+                                        },
+                                        "Set_variable_hash_row_key_SAP": {
+                                            "type": "SetVariable",
+                                            "inputs": {
+                                                "name": "HashRowKey",
+                                                "value": "@triggerBody()?['CustomerNo']"
+                                            },
+                                            "runAfter": {
+                                                "Set_variable_hash_partition_key_SAP": [
+                                                    "SUCCEEDED"
+                                                ]
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "case": "SAP"
+                    },
+                    "Case_Tradesolution": {
+                        "actions": {
+                            "Condition_-_ensure_TradesolutionId_set": {
+                                "type": "If",
+                                "expression": {
+                                    "and": [
+                                        {
+                                            "equals": [
+                                                "@triggerBody()?['TradesolutionId']",
+                                                "@null"
+                                            ]
+                                        }
+                                    ]
+                                },
+                                "actions": {
+                                    "Terminate_if_TradesolutionId_is_null": {
+                                        "type": "Terminate",
+                                        "inputs": {
+                                            "runStatus": "Failed",
+                                            "runError": {
+                                                "code": "400"
+                                            }
+                                        },
+                                        "runAfter": {
+                                            "Response_no_tradesolution_id_set": [
+                                                "SUCCEEDED"
+                                            ]
+                                        }
+                                    },
+                                    "Response_no_tradesolution_id_set": {
+                                        "type": "Response",
+                                        "kind": "Http",
+                                        "inputs": {
+                                            "statusCode": 400
+                                        }
+                                    }
+                                },
+                                "else": {
+                                    "actions": {
+                                        "Set_variable_hash_partition_key_TS": {
+                                            "type": "SetVariable",
+                                            "inputs": {
+                                                "name": "HashPartitionKey",
+                                                "value": "TSUpdateHash"
+                                            }
+                                        },
+                                        "Set_variable_hash_row_key_ts": {
+                                            "type": "SetVariable",
+                                            "inputs": {
+                                                "name": "HashRowKey",
+                                                "value": "@string(triggerBody()?['TradesolutionId'])"
+                                            },
+                                            "runAfter": {
+                                                "Set_variable_hash_partition_key_TS": [
+                                                    "SUCCEEDED"
+                                                ]
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "Set_variable__filter_customer_TS_id": {
+                                "type": "SetVariable",
+                                "inputs": {
+                                    "name": "AccountLookupFilter",
+                                    "value": "hbb_tradesolution_lopenummer eq '@{triggerBody()?['TradesolutionId']}'"
+                                },
+                                "runAfter": {
+                                    "Condition_-_ensure_TradesolutionId_set": [
+                                        "SUCCEEDED"
+                                    ]
+                                }
+                            }
+                        },
+                        "case": "TS"
+                    }
+                },
+                "runAfter": {
+                    "Initialize_variable_hash_row_key": [
+                        "SUCCEEDED"
+                    ]
+                }
+            },
+            "Initialize_variable_-_crm_account_lookup_filter": {
+                "type": "InitializeVariable",
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "AccountLookupFilter",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "runAfter": {
+                    "Initialize_variable_-_context": [
+                        "SUCCEEDED"
+                    ]
+                }
+            },
+            "List_rows_-_get_customer_by_filter": {
+                "type": "ApiConnection",
+                "inputs": {
+                    "host": {
+                        "connection": {
+                            "referenceName": "commondataservice"
+                        }
+                    },
+                    "method": "get",
+                    "headers": {
+                        "prefer": "odata.include-annotations=*",
+                        "accept": "application/json;odata.metadata=full",
+                        "organization": "@parameters('Dataverse_environment')"
+                    },
+                    "path": "/api/data/v9.1/@{encodeURIComponent(encodeURIComponent('accounts'))}",
+                    "queries": {
+                        "$filter": "@variables('AccountLookupFilter')"
+                    }
+                },
+                "runAfter": {
+                    "Switch_-_get_correct_customer_filter_based_on_context": [
+                        "SUCCEEDED"
+                    ]
+                }
+            },
+            "Condition_-_add_or_update": {
+                "type": "If",
+                "expression": {
+                    "and": [
+                        {
+                            "equals": [
+                                "@empty(body('List_rows_-_get_customer_by_filter')?['value'])",
+                                true
+                            ]
+                        }
+                    ]
+                },
+                "actions": {
+                    "Scope_add": {
+                        "type": "Scope",
+                        "actions": {
+                            "Switch_-_get_add_customer_model_based_on_context": {
+                                "type": "Switch",
+                                "expression": "@variables('CallerContext')",
+                                "default": {
+                                    "actions": {
+                                        "Terminate_not_a_valid_add_context": {
+                                            "type": "Terminate",
+                                            "inputs": {
+                                                "runStatus": "Failed",
+                                                "runError": {
+                                                    "code": "500",
+                                                    "message": "Unexpected context"
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "cases": {
+                                    "Case_create_from_SAP": {
+                                        "actions": {
+                                            "local_function_-_get_create_customer_model_from_SAP_data": {
+                                                "type": "InvokeFunction",
+                                                "inputs": {
+                                                    "functionName": "MapToSAPCreateCustomerModel",
+                                                    "parameters": {
+                                                        "request": {
+                                                            "Account": "@triggerBody()"
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            "Set_variable_add_customer_from_SAP_data": {
+                                                "type": "SetVariable",
+                                                "inputs": {
+                                                    "name": "PreparedUpsertModel",
+                                                    "value": "@body('local_function_-_get_create_customer_model_from_SAP_data')?['ODataModel']"
+                                                },
+                                                "runAfter": {
+                                                    "local_function_-_get_create_customer_model_from_SAP_data": [
+                                                        "SUCCEEDED"
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        "case": "SAP"
+                                    },
+                                    "Case__create_from_Tradesolution": {
+                                        "actions": {
+                                            "local_function_-_get_create_customer_model_from_Ts_data": {
+                                                "type": "InvokeFunction",
+                                                "inputs": {
+                                                    "functionName": "MapToTsCreateCustomerModel",
+                                                    "parameters": {
+                                                        "request": {
+                                                            "Account": "@triggerBody()"
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            "Set_variable_add_customer_from_TS_data": {
+                                                "type": "SetVariable",
+                                                "inputs": {
+                                                    "name": "PreparedUpsertModel",
+                                                    "value": "@body('local_function_-_get_create_customer_model_from_Ts_data')?['ODataModel']"
+                                                },
+                                                "runAfter": {
+                                                    "local_function_-_get_create_customer_model_from_Ts_data": [
+                                                        "SUCCEEDED"
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        "case": "TS"
+                                    }
+                                }
+                            },
+                            "Add_a_new_row_(preview)": {
+                                "type": "ApiConnection",
+                                "inputs": {
+                                    "host": {
+                                        "connection": {
+                                            "referenceName": "commondataservice"
+                                        }
+                                    },
+                                    "method": "post",
+                                    "body": "@variables('PreparedUpsertModel')",
+                                    "headers": {
+                                        "prefer": "return=representation,odata.include-annotations=*",
+                                        "organization": "@parameters('Dataverse_environment')",
+                                        "Content-Type": "application/json"
+                                    },
+                                    "path": "/api/data/v9.1/@{encodeURIComponent(encodeURIComponent('accounts'))}"
+                                },
+                                "runAfter": {
+                                    "Switch_-_get_add_customer_model_based_on_context": [
+                                        "SUCCEEDED"
+                                    ]
+                                }
+                            },
+                            "Response_created": {
+                                "type": "Response",
+                                "kind": "Http",
+                                "inputs": {
+                                    "statusCode": 201
+                                },
+                                "runAfter": {
+                                    "Add_a_new_row_(preview)": [
+                                        "SUCCEEDED"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "else": {
+                    "actions": {
+                        "Scope_update": {
+                            "type": "Scope",
+                            "actions": {
+                                "Switch_-_get_update_customer_model_base_on_context": {
+                                    "type": "Switch",
+                                    "expression": "@variables('CallerContext')",
+                                    "default": {
+                                        "actions": {
+                                            "Terminate_not_a_valid_update_context": {
+                                                "type": "Terminate",
+                                                "inputs": {
+                                                    "runStatus": "Failed"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "cases": {
+                                        "Case_update_from_SAP": {
+                                            "actions": {
+                                                "local_function_-_get_update_customer_model_from_SAP_data": {
+                                                    "type": "InvokeFunction",
+                                                    "inputs": {
+                                                        "functionName": "MapToSapUpdateCustomerModel",
+                                                        "parameters": {
+                                                            "request": {
+                                                                "Account": "@triggerBody()"
+                                                            }
+                                                        }
+                                                    }
+                                                },
+                                                "Set_variable_update_customer_from_SAP_data": {
+                                                    "type": "SetVariable",
+                                                    "inputs": {
+                                                        "name": "PreparedUpsertModel",
+                                                        "value": "@body('local_function_-_get_update_customer_model_from_SAP_data')?['ODataModel']"
+                                                    },
+                                                    "runAfter": {
+                                                        "local_function_-_get_update_customer_model_from_SAP_data": [
+                                                            "SUCCEEDED"
+                                                        ]
+                                                    }
+                                                }
+                                            },
+                                            "case": "SAP"
+                                        },
+                                        "Case__update_from_Tradesolution": {
+                                            "actions": {
+                                                "local_function_-_get_update_customer_model_from_TS_data": {
+                                                    "type": "InvokeFunction",
+                                                    "inputs": {
+                                                        "functionName": "MapToTsUpdateCustomerModel",
+                                                        "parameters": {
+                                                            "request": {
+                                                                "Account": "@triggerBody()",
+                                                                "IsSapCustomer": "@if (empty(body('List_rows_-_get_customer_by_filter')?['value']?[0]?['hbb_sapkundenummer']), false, true)"
+                                                            }
+                                                        }
+                                                    }
+                                                },
+                                                "Set_variable_update_customer_from_TS_data": {
+                                                    "type": "SetVariable",
+                                                    "inputs": {
+                                                        "name": "PreparedUpsertModel",
+                                                        "value": "@body('local_function_-_get_update_customer_model_from_TS_data')?['ODataModel']"
+                                                    },
+                                                    "runAfter": {
+                                                        "Set_variable_Has_data_to_update_for_TS_update": [
+                                                            "SUCCEEDED"
+                                                        ]
+                                                    }
+                                                },
+                                                "Set_variable_Has_data_to_update_for_TS_update": {
+                                                    "type": "SetVariable",
+                                                    "inputs": {
+                                                        "name": "HasDataToUpdate",
+                                                        "value": "@body('local_function_-_get_update_customer_model_from_TS_data')?['HasDataToUpdate']"
+                                                    },
+                                                    "runAfter": {
+                                                        "local_function_-_get_update_customer_model_from_TS_data": [
+                                                            "SUCCEEDED"
+                                                        ]
+                                                    }
+                                                },
+                                                "Set_variable_hash_for_ts_update": {
+                                                    "type": "SetVariable",
+                                                    "inputs": {
+                                                        "name": "UpdateHash",
+                                                        "value": "@body('local_function_-_get_update_customer_model_from_TS_data')?['Hash']"
+                                                    },
+                                                    "runAfter": {
+                                                        "Set_variable_update_customer_from_TS_data": [
+                                                            "SUCCEEDED"
+                                                        ]
+                                                    }
+                                                }
+                                            },
+                                            "case": "TS"
+                                        }
+                                    },
+                                    "runAfter": {
+                                        "Set_variable_old_hash": [
+                                            "SUCCEEDED"
+                                        ]
+                                    }
+                                },
+                                "Response_updated": {
+                                    "type": "Response",
+                                    "kind": "Http",
+                                    "inputs": {
+                                        "statusCode": 200
+                                    },
+                                    "runAfter": {
+                                        "Condition_Has_TS_data_to_update": [
+                                            "SUCCEEDED"
+                                        ]
+                                    }
+                                },
+                                "Condition_Has_TS_data_to_update": {
+                                    "type": "If",
+                                    "expression": {
+                                        "and": [
+                                            {
+                                                "equals": [
+                                                    "@variables('HasDataToUpdate')",
+                                                    true
+                                                ]
+                                            },
+                                            {
+                                                "not": {
+                                                    "equals": [
+                                                        "@variables('UpdateHash')",
+                                                        "@variables('OldHash')"
+                                                    ]
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    "actions": {
+                                        "Update_a_row_(preview)": {
+                                            "type": "ApiConnection",
+                                            "inputs": {
+                                                "host": {
+                                                    "connection": {
+                                                        "referenceName": "commondataservice"
+                                                    }
+                                                },
+                                                "method": "patch",
+                                                "body": "@variables('PreparedUpsertModel')",
+                                                "headers": {
+                                                    "prefer": "return=representation,odata.include-annotations=*",
+                                                    "accept": "application/json;odata.metadata=full",
+                                                    "organization": "@parameters('Dataverse_environment')"
+                                                },
+                                                "path": "/api/data/v9.1/@{encodeURIComponent(encodeURIComponent('accounts'))}(@{encodeURIComponent(encodeURIComponent(body('List_rows_-_get_customer_by_filter')?['value']?[0]?['accountid']))})"
+                                            }
+                                        },
+                                        "Insert_or_Update_hash_for_update": {
+                                            "type": "ServiceProvider",
+                                            "inputs": {
+                                                "parameters": {
+                                                    "tableName": "Hashes",
+                                                    "entity": {
+                                                        "PartitionKey": "@{variables('HashPartitionKey')}",
+                                                        "RowKey": "@{variables('HashRowKey')}",
+                                                        "Hash": "@{variables('UpdateHash')}"
+                                                    }
+                                                },
+                                                "serviceProviderConfiguration": {
+                                                    "connectionName": "azuretables",
+                                                    "operationId": "upsertEntity",
+                                                    "serviceProviderId": "/serviceProviders/azureTables"
+                                                }
+                                            },
+                                            "runAfter": {
+                                                "Update_a_row_(preview)": [
+                                                    "SUCCEEDED"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "else": {
+                                        "actions": {}
+                                    },
+                                    "runAfter": {
+                                        "Switch_-_get_update_customer_model_base_on_context": [
+                                            "SUCCEEDED"
+                                        ]
+                                    }
+                                },
+                                "Query_Entities_-_Get_old_TS_update_hash": {
+                                    "type": "ServiceProvider",
+                                    "inputs": {
+                                        "parameters": {
+                                            "tableName": "Hashes",
+                                            "filter": "PartitionKey eq 'TSUpdateHash' and RowKey eq '@{triggerBody()?['TradesolutionId']}'",
+                                            "top": 1
+                                        },
+                                        "serviceProviderConfiguration": {
+                                            "connectionName": "azuretables",
+                                            "operationId": "queryEntities",
+                                            "serviceProviderId": "/serviceProviders/azureTables"
+                                        }
+                                    }
+                                },
+                                "Set_variable_old_hash": {
+                                    "type": "SetVariable",
+                                    "inputs": {
+                                        "name": "OldHash",
+                                        "value": "@outputs('Query_Entities_-_Get_old_TS_update_hash')?['body']?['entities']?[0]?['Hash']"
+                                    },
+                                    "runAfter": {
+                                        "Query_Entities_-_Get_old_TS_update_hash": [
+                                            "SUCCEEDED"
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "runAfter": {
+                    "Initialize_variable_Old_hash_value": [
+                        "SUCCEEDED"
+                    ]
+                }
+            },
+            "Initialize_variable_prepared_upsert_model": {
+                "type": "InitializeVariable",
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "PreparedUpsertModel",
+                            "type": "object"
+                        }
+                    ]
+                },
+                "runAfter": {
+                    "List_rows_-_get_customer_by_filter": [
+                        "SUCCEEDED"
+                    ]
+                }
+            },
+            "Initialize_variable_Has_data_to_update": {
+                "type": "InitializeVariable",
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "HasDataToUpdate",
+                            "type": "boolean",
+                            "value": true
+                        }
+                    ]
+                },
+                "runAfter": {
+                    "Initialize_variable_prepared_upsert_model": [
+                        "SUCCEEDED"
+                    ]
+                }
+            },
+            "Initialize_variable_hash": {
+                "type": "InitializeVariable",
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "UpdateHash",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "runAfter": {
+                    "Initialize_variable_Has_data_to_update": [
+                        "SUCCEEDED"
+                    ]
+                }
+            },
+            "Initialize_variable_Old_hash_value": {
+                "type": "InitializeVariable",
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "OldHash",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "runAfter": {
+                    "Initialize_variable_hash": [
+                        "SUCCEEDED"
+                    ]
+                }
+            },
+            "Initialize_variable_hash_partition_key": {
+                "type": "InitializeVariable",
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "HashPartitionKey",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "runAfter": {
+                    "Initialize_variable_-_crm_account_lookup_filter": [
+                        "SUCCEEDED"
+                    ]
+                }
+            },
+            "Initialize_variable_hash_row_key": {
+                "type": "InitializeVariable",
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "HashRowKey",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "runAfter": {
+                    "Initialize_variable_hash_partition_key": [
+                        "SUCCEEDED"
+                    ]
+                }
+            }
+        },
+        "contentVersion": "1.0.0.0",
+        "outputs": {},
+        "triggers": {
+            "When_a_HTTP_request_is_received": {
+                "type": "Request",
+                "kind": "Http",
+                "inputs": {
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "CustomerNo": {
+                                "type": "string"
+                            },
+                            "TradesolutionId": {
+                                "type": "integer"
+                            },
+                            "VatNo": {
+                                "type": "string"
+                            },
+                            "Name": {
+                                "type": "string"
+                            },
+                            "LegalName": {
+                                "type": "string"
+                            },
+                            "SalesChannel": {
+                                "type": "string"
+                            },
+                            "Type": {
+                                "type": "string"
+                            },
+                            "Telephone1": {
+                                "type": "string"
+                            },
+                            "Telephone2": {
+                                "type": "string"
+                            },
+                            "Email": {
+                                "type": "string"
+                            },
+                            "DeliveryAdress1": {
+                                "type": "string"
+                            },
+                            "DeliveryAddress2": {
+                                "type": "string"
+                            },
+                            "DeliveryPostalCode": {
+                                "type": "string"
+                            },
+                            "DeliveryPostalCity": {
+                                "type": "string"
+                            },
+                            "DeliveryLatitude": {
+                                "type": "string"
+                            },
+                            "DeliveryLongitude": {
+                                "type": "string"
+                            },
+                            "DeliveryCounty": {
+                                "type": "string"
+                            },
+                            "DeliveryMunicipality": {
+                                "type": "string"
+                            },
+                            "InvoiceAddress1": {
+                                "type": "string"
+                            },
+                            "InvoiceAddress2": {
+                                "type": "string"
+                            },
+                            "InvoicePostalCode": {
+                                "type": "string"
+                            },
+                            "InvoicePostalCity": {
+                                "type": "string"
+                            },
+                            "InvoiceEmail": {
+                                "type": "string"
+                            },
+                            "VisitingAddress1": {
+                                "type": "string"
+                            },
+                            "VisitingAddress2": {
+                                "type": "string"
+                            },
+                            "VisitingPostalCode": {
+                                "type": "string"
+                            },
+                            "VisitingPostalCity": {
+                                "type": "string"
+                            },
+                            "VistingAddressNote": {
+                                "type": "string"
+                            },
+                            "DeliveryFrequency": {
+                                "type": "string"
+                            },
+                            "AlcoholLicense": {
+                                "type": "string"
+                            },
+                            "AlcoholLicenseBeginDate": {
+                                "type": "string"
+                            },
+                            "AlcoholLicenseEndDate": {
+                                "type": "string"
+                            },
+                            "AgreementBeginDate": {
+                                "type": "string"
+                            },
+                            "AgreementEndDate": {
+                                "type": "string"
+                            },
+                            "Status": {
+                                "type": "string"
+                            },
+                            "OrderBlock": {
+                                "type": "boolean"
+                            },
+                            "CreditLimit": {
+                                "type": "integer"
+                            },
+                            "PaymentTerms": {
+                                "type": "integer"
+                            },
+                            "Owner": {
+                                "type": "string"
+                            },
+                            "PrimaryContactName": {
+                                "type": "string"
+                            },
+                            "PrimaryContactEmail": {
+                                "type": "string"
+                            },
+                            "PrimaryContactTelephone1": {
+                                "type": "string"
+                            },
+                            "SalesTerritory": {
+                                "type": "integer"
+                            },
+                            "TankBeerCustomer": {
+                                "type": "boolean"
+                            },
+                            "CutNumberOfHours": {
+                                "type": "integer"
+                            },
+                            "CutTimeOfDay": {
+                                "type": "string"
+                            },
+                            "CutNumberOfHoursTankBeer": {
+                                "type": "integer"
+                            },
+                            "CutTimeOfDayTankBeer": {
+                                "type": "string"
+                            },
+                            "ParentLevel": {
+                                "type": "string"
+                            },
+                            "InternalWarehouse": {
+                                "type": "string"
+                            },
+                            "WholesalerWarehouse": {
+                                "type": "string"
+                            },
+                            "InternalMemberNumber": {
+                                "type": "string"
+                            },
+                            "VatTaxCode": {
+                                "type": "integer"
+                            },
+                            "GLN": {
+                                "type": "integer"
+                            },
+                            "Description": {
+                                "type": "string"
+                            },
+                            "LastChangedDate": {
+                                "type": "string"
+                            },
+                            "LastChangedBy": {
+                                "type": "string"
+                            },
+                            "StatisticsNumber": {
+                                "type": "integer"
+                            },
+                            "BankAccountNumber": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "CustomerNo",
+                            "TradesolutionId",
+                            "VatNo",
+                            "Name",
+                            "LegalName",
+                            "SalesChannel",
+                            "Type",
+                            "Telephone1",
+                            "Telephone2",
+                            "Email",
+                            "DeliveryAdress1",
+                            "DeliveryAddress2",
+                            "DeliveryPostalCode",
+                            "DeliveryPostalCity",
+                            "DeliveryLatitude",
+                            "DeliveryLongitude",
+                            "DeliveryCounty",
+                            "DeliveryMunicipality",
+                            "InvoiceAddress1",
+                            "InvoiceAddress2",
+                            "InvoicePostalCode",
+                            "InvoicePostalCity",
+                            "InvoiceEmail",
+                            "VisitingAddress1",
+                            "VisitingAddress2",
+                            "VisitingPostalCode",
+                            "VisitingPostalCity",
+                            "VistingAddressNote",
+                            "DeliveryFrequency",
+                            "AlcoholLicense",
+                            "AlcoholLicenseBeginDate",
+                            "AlcoholLicenseEndDate",
+                            "AgreementBeginDate",
+                            "AgreementEndDate",
+                            "Status",
+                            "OrderBlock",
+                            "CreditLimit",
+                            "PaymentTerms",
+                            "Owner",
+                            "PrimaryContactName",
+                            "PrimaryContactEmail",
+                            "PrimaryContactTelephone1",
+                            "SalesTerritory",
+                            "TankBeerCustomer",
+                            "CutNumberOfHours",
+                            "CutTimeOfDay",
+                            "CutNumberOfHoursTankBeer",
+                            "CutTimeOfDayTankBeer",
+                            "ParentLevel",
+                            "InternalWarehouse",
+                            "WholesalerWarehouse",
+                            "InternalMemberNumber",
+                            "VatTaxCode",
+                            "GLN",
+                            "Description",
+                            "LastChangedDate",
+                            "LastChangedBy",
+                            "StatisticsNumber",
+                            "BankAccountNumber"
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    "kind": "Stateful"
+}

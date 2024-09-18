@@ -1,0 +1,99 @@
+{
+    "definition": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "actions": {
+            "Get_rows_(V2)": {
+                "type": "ApiConnection",
+                "inputs": {
+                    "host": {
+                        "connection": {
+                            "referenceName": "sql"
+                        }
+                    },
+                    "method": "get",
+                    "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('4xv7ztimpg6exks34r6loehyv4-3zyy5bkuujvuvhvgztc4lfjsle.datawarehouse.fabric.microsoft.com'))},@{encodeURIComponent(encodeURIComponent('Served'))}/tables/@{encodeURIComponent(encodeURIComponent('crmaccounts'))}/items",
+                    "queries": {
+                        "$filter": "LastModifiedDate gt @{subtractFromTime(utcNow(), 30, 'Day')}",
+                        "$top": 1
+                    }
+                },
+                "runAfter": {}
+            },
+            "For_each": {
+                "type": "Foreach",
+                "foreach": "@body('Get_rows_(V2)')?['value']",
+                "actions": {
+                    "Invoke_a_workflow_in_this_workflow_app": {
+                        "type": "Workflow",
+                        "inputs": {
+                            "host": {
+                                "workflow": {
+                                    "id": "Inbound-Upsert-Account"
+                                }
+                            },
+                            "headers": {
+                                "import-context": "TS"
+                            },
+                            "body": "@outputs('Compose')"
+                        },
+                        "runAfter": {
+                            "Compose": [
+                                "SUCCEEDED"
+                            ]
+                        }
+                    },
+                    "Compose": {
+                        "type": "Compose",
+                        "inputs": {
+                            "TradesolutionId": "@items('For_each')?['TradesolutionId']",
+                            "VatNo": "@items('For_each')?['VatNo']",
+                            "Name": "@items('For_each')?['Name']",
+                            "LegalName": "@items('For_each')?['LegalName']",
+                            "Telephone1": "@items('For_each')?['Telephone1']",
+                            "DeliveryAddress1": "@items('For_each')?['DeliveryAddress1']",
+                            "DeliveryPostalCode": "@items('For_each')?['DeliveryPostalCode']",
+                            "DeliveryPostalCity": "@items('For_each')?['DeliveryPostalCity']",
+                            "DeliveryLatitude": "@items('For_each')?['DeliveryLatitude']",
+                            "DeliveryLongitude": "@items('For_each')?['DeliveryLongitude']",
+                            "DeliveryCounty": "@items('For_each')?['DeliveryCounty']",
+                            "DeliveryMunicipality": "@items('For_each')?['DeliveryMunicipality']",
+                            "InvoiceAddress1": "@items('For_each')?['InvoiceAddress1']",
+                            "InvoicePostalCode": "@items('For_each')?['InvoicePostalCode']",
+                            "InvoicePostalCity": "@items('For_each')?['InvoicePostalCity']",
+                            "InvoiceEmail": "@items('For_each')?['InvoiceEmail']",
+                            "OpeningDate": "@items('For_each')?['OpeningDate']",
+                            "ClosingDate": "@items('For_each')?['ClosingDate']",
+                            "BankAccountNumber": "@items('For_each')?['BankAccountNumber']",
+                            "SalesAreaSquareMeter": "@items('For_each')?['SalesAreaSquareMeter']",
+                            "Description": "@items('For_each')?['Description']",
+                            "Type": "@items('For_each')?['Type']",
+                            "SalesChannel": "@items('For_each')?['SalesChannel']"
+                        }
+                    }
+                },
+                "runAfter": {
+                    "Get_rows_(V2)": [
+                        "SUCCEEDED"
+                    ]
+                }
+            }
+        },
+        "contentVersion": "1.0.0.0",
+        "outputs": {},
+        "triggers": {
+            "Recurrence": {
+                "type": "Recurrence",
+                "recurrence": {
+                    "interval": 3,
+                    "frequency": "Day"
+                },
+                "runtimeConfiguration": {
+                    "concurrency": {
+                        "runs": 1
+                    }
+                }
+            }
+        }
+    },
+    "kind": "Stateful"
+}

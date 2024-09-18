@@ -1,6 +1,4 @@
-
-using RU_NO_CRM_Functions.Models;
-using RU_NO_CRM_Functions.Models.Factories;
+using RU_NO_CRM_Functions.Models.Inbound;
 using RU_NO_CRM_Functions.Services;
 
 namespace RU.NO.CRM;
@@ -9,6 +7,9 @@ using System.Threading.Tasks;
 using Microsoft.Azure.Functions.Extensions.Workflows;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using RU_NO_CRM_Functions.Models.Factories.Inbound;
+using RU_NO_CRM_Functions.Models.Inbound.Requests;
+using RU_NO_CRM_Functions.Models.Inbound.Responses;
 
 /// <summary>
 /// Processes inbound service bus account messages

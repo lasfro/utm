@@ -1,16 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
-namespace RU_NO_CRM_Functions.Models
+namespace RU_NO_CRM_Functions.Models.Outbound
 {
 
     public class DataverseAccountRequestMessage
     {
-        
+
         public string? address1_latitudeODataCommunityDisplayV1FormattedValue { get; set; }
         public float? address1_latitude { get; set; }
         public string? mergedODataCommunityDisplayV1FormattedValue { get; set; }

@@ -2,13 +2,14 @@ using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
 using RU_NO_CRM_Functions.Models;
-using RU_NO_CRM_Functions.Models.Factories;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Azure.Functions.Extensions.Workflows;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using RU_NO_CRM_Functions.Models.Wsdl.CustomerCreate;
+using RU_NO_CRM_Functions.Models.Outbound;
+using RU_NO_CRM_Functions.Models.Factories.Outbound;
 
 namespace RU.NO.CRM;
 

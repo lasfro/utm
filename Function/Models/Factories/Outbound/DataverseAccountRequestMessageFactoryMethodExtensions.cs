@@ -1,4 +1,6 @@
-﻿namespace RU_NO_CRM_Functions.Models.Factories
+﻿using RU_NO_CRM_Functions.Models.Outbound;
+
+namespace RU_NO_CRM_Functions.Models.Factories.Outbound
 {
     public static class DataverseAccountRequestMessageFactoryMethodExtensions
     {
@@ -34,7 +36,7 @@
                 Address1Phone3 = accountRequestMessage.address1_telephone3,
                 Address1PostOfficeBox = accountRequestMessage.address1_postofficebox,
                 Address2PostOfficeBox = accountRequestMessage.address2_postofficebox,
-                Address1PostalCodePostOfficeBox = string.IsNullOrWhiteSpace(accountRequestMessage.address1_postofficebox) ? null: accountRequestMessage.address1_postalcode,
+                Address1PostalCodePostOfficeBox = string.IsNullOrWhiteSpace(accountRequestMessage.address1_postofficebox) ? null : accountRequestMessage.address1_postalcode,
                 Address2PostalCodePostOfficeBox = string.IsNullOrWhiteSpace(accountRequestMessage.address2_postofficebox) ? null : accountRequestMessage.address2_postalcode,
                 Address1StateOrProvince = accountRequestMessage.address1_stateorprovince,
                 Address2StateOrProvince = accountRequestMessage.address2_stateorprovince,
@@ -58,6 +60,6 @@
                 AlcoholLicenseEndDate = accountRequestMessage.hbb_licence_alc_todate
             };
         }
-        
+
     }
 }

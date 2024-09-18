@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using RU_NO_CRM_Functions.Models.Outbound;
 using RU_NO_CRM_Functions.Models.Wsdl.CustomerCreate;
 using RU_NO_CRM_Functions.Services;
 
-namespace RU_NO_CRM_Functions.Models.Factories
+namespace RU_NO_CRM_Functions.Models.Factories.Outbound
 {
     public static class OutboundAccountResponseFactoryExtensions
     {
@@ -95,7 +96,7 @@ namespace RU_NO_CRM_Functions.Models.Factories
                 Bbbnr = res.GLN,
                 Bbsnr = res.GLN,
                 Bubkz = res.GLN,
-                Stceg = "NO"+res.VATRegistrationNumber??"",
+                Stceg = "NO" + res.VATRegistrationNumber ?? "",
                 Kukla = res.Category,
                 Vbund = "EXTERN",
                 Ktokd = "0001",
@@ -111,7 +112,7 @@ namespace RU_NO_CRM_Functions.Models.Factories
         private static ZsiCmdContactPerson[] CreateContactPersons(OutboundAccountResponse res)
         {
             var contactPersonList = new List<ZsiCmdContactPerson>();
-            
+
             //todo: do we need to extract contacts for customer?
 
             return contactPersonList.ToArray();
@@ -119,7 +120,7 @@ namespace RU_NO_CRM_Functions.Models.Factories
 
         private static Bapiad1vl CreateAddress(OutboundAccountResponse res)
         {
-            var addressInfo = AddressHelperService.SplitStreetAndHouseNumber(res.Address1Line1??"");
+            var addressInfo = AddressHelperService.SplitStreetAndHouseNumber(res.Address1Line1 ?? "");
             //todo: look at address mapping
             return new Bapiad1vl
             {
@@ -140,8 +141,8 @@ namespace RU_NO_CRM_Functions.Models.Factories
                 Regiogroup = res.Address1StateOrProvince,
                 Street = addressInfo.street,
                 HouseNo = addressInfo.houseNumber
-                
-                
+
+
             };
         }
 

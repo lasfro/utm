@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using RU_NO_CRM_Functions.Models;
-using RU_NO_CRM_Functions.Models.Factories;
+using RU_NO_CRM_Functions.Models.Factories.Inbound;
+using RU_NO_CRM_Functions.Models.Inbound;
+using RU_NO_CRM_Functions.Models.Inbound.Requests;
+using RU_NO_CRM_Functions.Models.Inbound.Responses;
 
 namespace RU_NO_CRM_Functions.Services;
 
@@ -30,17 +32,17 @@ public class InboundMessageBusAccountsService {
             foreach (var account in accounts)
             {
                 
-                if (mappings.TryGetValue(account.AccountId, out var currentParent)) {
+                if (mappings.TryGetValue(account.CustomerNo, out var currentParent)) {
                     // if item is already parented, make sure we remove it from the current parent
                     if (currentParent != null)
                     {
-                        var currentItem = currentParent.Accounts.First(i => i.AccountId == account.AccountId);
+                        var currentItem = currentParent.Accounts.First(i => i.CustomerNo == account.CustomerNo);
                         currentParent.Accounts.Remove(account);
                     }
                 }
 
                 // map to new parent
-                mappings[account.AccountId] = responseItem;
+                mappings[account.CustomerNo] = responseItem;
             }
         }
     }

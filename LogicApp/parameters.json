@@ -42,5 +42,17 @@
       "scheme": "Key",
       "parameter": "@appsetting('commondataservice-connectionKey')"
     }
+  },
+  "sql-ConnectionRuntimeUrl": {
+    "type": "String",
+    "value": "@appsetting('sql-ConnectionRuntimeUrl')"
+  },
+  "sql-Authentication": {
+    "type": "Object",
+    "value": {
+      "type": "Raw",
+      "scheme": "Key",
+      "parameter": "@appsetting('sql-connectionKey')"
+    }
   }
 }
