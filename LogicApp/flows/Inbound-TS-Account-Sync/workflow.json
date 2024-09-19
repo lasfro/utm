@@ -7,13 +7,12 @@
                 "inputs": {
                     "host": {
                         "connection": {
-                            "referenceName": "sql"
+                            "referenceName": "sql-1"
                         }
                     },
                     "method": "get",
-                    "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('4xv7ztimpg6exks34r6loehyv4-3zyy5bkuujvuvhvgztc4lfjsle.datawarehouse.fabric.microsoft.com'))},@{encodeURIComponent(encodeURIComponent('Served'))}/tables/@{encodeURIComponent(encodeURIComponent('crmaccounts'))}/items",
+                    "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('sql-no-core-dev.database.windows.net'))},@{encodeURIComponent(encodeURIComponent('Tradesolution'))}/tables/@{encodeURIComponent(encodeURIComponent('v_changed_crm_accounts'))}/items",
                     "queries": {
-                        "$filter": "LastModifiedDate gt @{subtractFromTime(utcNow(), 30, 'Day')}",
                         "$top": 1
                     }
                 },
