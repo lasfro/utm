@@ -16,7 +16,7 @@
                         "accept": "application/json;odata.metadata=full",
                         "organization": "@parameters('Dataverse_environment')"
                     },
-                    "path": "/api/data/v9.1/@{encodeURIComponent(encodeURIComponent('accounts'))}(@{encodeURIComponent(encodeURIComponent('99b55132-44f2-ed11-8849-0022489fdbe5'))})"
+                    "path": "/api/data/v9.1/@{encodeURIComponent(encodeURIComponent('accounts'))}(@{encodeURIComponent(encodeURIComponent('d2a1e4d3-43a4-e311-9e9d-6c3be5befd9c'))})"
                 },
                 "runAfter": {
                     "List_rows_(preview)": [
@@ -60,20 +60,6 @@
                 },
                 "runAfter": {}
             },
-            "Call_a_local_function_-_get_soap_content": {
-                "type": "InvokeFunction",
-                "inputs": {
-                    "functionName": "MapToXmlOutboundModel",
-                    "parameters": {
-                        "requestMessage": "@body('Get_a_row_by_ID_(preview)')"
-                    }
-                },
-                "runAfter": {
-                    "Call_a_local_function_-_map_to_outbound_model": [
-                        "SUCCEEDED"
-                    ]
-                }
-            },
             "HTTP_-_get_access_token": {
                 "type": "Http",
                 "inputs": {
@@ -86,7 +72,7 @@
                     }
                 },
                 "runAfter": {
-                    "Add_a_new_row_(preview)": [
+                    "Call_a_local_function_-_map_outbound_to_soap": [
                         "SUCCEEDED"
                     ]
                 },
@@ -110,7 +96,7 @@
                         "Authorization": "Bearer @{body('HTTP_-_get_access_token')?['access_token']}",
                         "Content-Type": "text/xml"
                     },
-                    "body": "@\r\nbase64ToString(body('Call_a_local_function_-_get_soap_content')?['Base64Data'])"
+                    "body": "@base64ToString(body('Call_a_local_function_-_map_outbound_to_soap')?['Base64Data'])"
                 },
                 "runAfter": {
                     "HTTP_-_get_access_token": [
@@ -123,25 +109,157 @@
                     }
                 }
             },
-            "Add_a_new_row_(preview)": {
-                "type": "ApiConnection",
+            "Call_a_local_function_-_map_outbound_to_soap": {
+                "type": "InvokeFunction",
                 "inputs": {
-                    "host": {
-                        "connection": {
-                            "referenceName": "commondataservice"
+                    "functionName": "MapOutboundAccountToSoap",
+                    "parameters": {
+                        "requestMessage": {
+                            "Account": "@body('Call_a_local_function_-_map_to_outbound_model')"
                         }
-                    },
-                    "method": "post",
-                    "body": "@parameters('Dummy')",
-                    "headers": {
-                        "prefer": "return=representation,odata.include-annotations=*",
-                        "organization": "@parameters('Dataverse_environment')",
-                        "Content-Type": "application/json"
-                    },
-                    "path": "/api/data/v9.1/@{encodeURIComponent(encodeURIComponent('accounts'))}"
+                    }
                 },
                 "runAfter": {
-                    "Call_a_local_function_-_get_soap_content": [
+                    "Compose_-_set_EmployeeId": [
+                        "SUCCEEDED"
+                    ]
+                }
+            },
+            "Condition_-_SalesPerson_set": {
+                "type": "If",
+                "expression": {
+                    "and": [
+                        {
+                            "not": {
+                                "equals": [
+                                    "@body('Call_a_local_function_-_map_to_outbound_model')?['SalesPerson']",
+                                    "@null"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                "actions": {
+                    "List_rows_(preview)_-_user_for_owner": {
+                        "type": "ApiConnection",
+                        "inputs": {
+                            "host": {
+                                "connection": {
+                                    "referenceName": "commondataservice"
+                                }
+                            },
+                            "method": "get",
+                            "headers": {
+                                "prefer": "odata.include-annotations=*",
+                                "accept": "application/json;odata.metadata=full",
+                                "organization": "@parameters('Dataverse_environment')"
+                            },
+                            "path": "/api/data/v9.1/@{encodeURIComponent(encodeURIComponent('systemusers'))}",
+                            "queries": {
+                                "$filter": "systemuserid eq '@{body('Call_a_local_function_-_map_to_outbound_model')?['SalesPerson']}'"
+                            }
+                        }
+                    },
+                    "Condition_-_user_has_value": {
+                        "type": "If",
+                        "expression": {
+                            "and": [
+                                {
+                                    "not": {
+                                        "equals": [
+                                            "@empty(body('List_rows_(preview)_-_user_for_owner')?['value'])",
+                                            true
+                                        ]
+                                    }
+                                }
+                            ]
+                        },
+                        "actions": {
+                            "HTTP_-_get_employee_id_by_email": {
+                                "type": "Http",
+                                "inputs": {
+                                    "uri": "https://graph.microsoft.com/v1.0/users?$filter=mail eq '@{body('List_rows_(preview)_-_user_for_owner')?['value']?[0]?['internalEmailAddress']}'&$select=employeeId",
+                                    "method": "GET",
+                                    "authentication": "@parameters('graph-lookup-authentication')"
+                                },
+                                "runtimeConfiguration": {
+                                    "contentTransfer": {
+                                        "transferMode": "Chunked"
+                                    }
+                                }
+                            },
+                            "Condition_-_employeeIdFound": {
+                                "type": "If",
+                                "expression": {
+                                    "and": [
+                                        {
+                                            "equals": [
+                                                "@length(body('HTTP_-_get_employee_id_by_email')?['value'])",
+                                                1
+                                            ]
+                                        }
+                                    ]
+                                },
+                                "actions": {
+                                    "Set_variable_-_empolyeeId": {
+                                        "type": "SetVariable",
+                                        "inputs": {
+                                            "name": "EmployeeId",
+                                            "value": "@body('HTTP_-_get_employee_id_by_email')?['value']?[0]?['employeeId']"
+                                        }
+                                    }
+                                },
+                                "else": {
+                                    "actions": {}
+                                },
+                                "runAfter": {
+                                    "HTTP_-_get_employee_id_by_email": [
+                                        "SUCCEEDED"
+                                    ]
+                                }
+                            }
+                        },
+                        "else": {
+                            "actions": {}
+                        },
+                        "runAfter": {
+                            "List_rows_(preview)_-_user_for_owner": [
+                                "SUCCEEDED"
+                            ]
+                        }
+                    }
+                },
+                "else": {
+                    "actions": {}
+                },
+                "runAfter": {
+                    "Initialize_variable_-_EmployeeId": [
+                        "SUCCEEDED"
+                    ]
+                }
+            },
+            "Initialize_variable_-_EmployeeId": {
+                "type": "InitializeVariable",
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "EmployeeId",
+                            "type": "string",
+                            "value": "@null"
+                        }
+                    ]
+                },
+                "runAfter": {
+                    "Call_a_local_function_-_map_to_outbound_model": [
+                        "SUCCEEDED"
+                    ]
+                }
+            },
+            "Compose_-_set_EmployeeId": {
+                "type": "Compose",
+                "inputs": "@setProperty(body('Call_a_local_function_-_map_to_outbound_model'), 'SalesPerson', variables('EmployeeId'))",
+                "runAfter": {
+                    "Condition_-_SalesPerson_set": [
                         "SUCCEEDED"
                     ]
                 }

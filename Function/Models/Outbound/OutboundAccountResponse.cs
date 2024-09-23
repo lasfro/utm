@@ -49,5 +49,8 @@ namespace RU_NO_CRM_Functions.Models.Outbound
         public string? Segment { get; set; }
         public DateTimeOffset? AlcoholLicenseBeginDate { get; set; }
         public DateTimeOffset? AlcoholLicenseEndDate { get; set; }
+        public string? SalesPerson { get; set; }
+        public string? AlcoholLicenseTypeId { get; set; }
+        public string? AlcoholLicenseNumber { get; set; }
     }
 }

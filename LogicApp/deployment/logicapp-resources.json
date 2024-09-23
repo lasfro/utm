@@ -4,8 +4,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.29.47.4906",
-      "templateHash": "12628170178401018897"
+      "version": "0.30.3.12046",
+      "templateHash": "8378790679151102455"
     }
   },
   "parameters": {
@@ -383,6 +383,18 @@
       },
       "dependsOn": [
         "[resourceId('Microsoft.KeyVault/vaults', parameters('localKeyVaultName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Authorization/roleAssignments",
+      "apiVersion": "2020-04-01-preview",
+      "name": "[guid(subscription().id, 'Microsoft.Authorization', 'roleAssignments', 'graphRoleAssignment')]",
+      "properties": {
+        "principalId": "[reference(resourceId('Microsoft.Web/sites', parameters('logicAppName')), '2022-09-01', 'full').identity.principalId]",
+        "roleDefinitionId": "/providers/Microsoft.Authorization/roleDefinitions/18d7d88d-d35e-4fb5-a5c3-7773c20a72d9"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', parameters('logicAppName'))]"
       ]
     }
   ],

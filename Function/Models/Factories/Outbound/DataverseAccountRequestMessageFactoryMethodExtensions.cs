@@ -1,4 +1,5 @@
 ﻿using RU_NO_CRM_Functions.Models.Outbound;
+using System;
 
 namespace RU_NO_CRM_Functions.Models.Factories.Outbound
 {
@@ -50,14 +51,16 @@ namespace RU_NO_CRM_Functions.Models.Factories.Outbound
                 CustomerType = accountRequestMessage.hbb_type,
                 CustomersCustomerNumber = accountRequestMessage.cr0c6_customers_customernumber,
                 CreditLimit = accountRequestMessage.creditlimit,
-                // ownerid?????
                 //TermsOfPayment = accountRequestMessage.terms
                 WareHouse = accountRequestMessage.WareHouse,
                 WareHouseId = accountRequestMessage.WareHouseId,
                 // look into alcohol licence details
                 Segment = accountRequestMessage.Segment,
                 AlcoholLicenseBeginDate = accountRequestMessage.hbb_licence_alc_fromdate,
-                AlcoholLicenseEndDate = accountRequestMessage.hbb_licence_alc_todate
+                AlcoholLicenseEndDate = accountRequestMessage.hbb_licence_alc_todate,
+                AlcoholLicenseTypeId = "D",  // todo: add mapping here
+                AlcoholLicenseNumber = null,  // todo: add mapping here
+                SalesPerson = accountRequestMessage._ownerid_value?.ToString()  //sets as guid, need lookup before sending
             };
         }
 

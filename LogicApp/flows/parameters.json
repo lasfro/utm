@@ -30,5 +30,16 @@
       "scheme": "Key",
       "parameter": "@appsetting('servicebus-connectionKey')"
     }
+  },
+  "graph-lookup-authentication": {
+    "type": "Object",
+    "value": {
+      "type": "ActiveDirectoryOAuth",
+      "authority": "@appsetting('GraphAuthority')",
+      "tenant": "@appsetting('GraphTenant')",
+      "audience": "@appsetting('GraphAudience')",
+      "clientId": "@appsetting('GraphClientId')",
+      "secret": "@appsetting('GraphClientSecret')"
+    }
   }
 }

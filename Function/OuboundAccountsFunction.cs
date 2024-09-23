@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using RU_NO_CRM_Functions.Models.Wsdl.CustomerCreate;
 using RU_NO_CRM_Functions.Models.Outbound;
 using RU_NO_CRM_Functions.Models.Factories.Outbound;
+using RU_NO_CRM_Functions.Models.Inbound.Requests;
 
 namespace RU.NO.CRM;
 
@@ -30,13 +31,11 @@ public class OutboundAccountsFunction(ILoggerFactory loggerFactory)
         return Task.FromResult(responseData);
     }
 
-    [Function(nameof(MapToXmlOutboundModel))]
-    public Task<Base64Response> MapToXmlOutboundModel(
-        [WorkflowActionTrigger] DataverseAccountRequestMessage requestMessage)
+    [Function(nameof(MapOutboundAccountToSoap))]
+    public Task<Base64Response> MapOutboundAccountToSoap(
+        [WorkflowActionTrigger] MapOutboundAccountToSoapRequest requestMessage)
     {
-        
-        var nonXmlResponseData = requestMessage.ToOutboundAccount();
-        var xmlResponseData = nonXmlResponseData.ToXmlCreateCustomerRequest();
+        var responseData = requestMessage.Account.ToXmlCreateCustomerRequest();
 
         var serializer = new XmlSerializer(typeof(CustomerCreateSoapEnvelope));
         XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
@@ -55,7 +54,7 @@ public class OutboundAccountsFunction(ILoggerFactory loggerFactory)
 
         var envelope = new CustomerCreateSoapEnvelope();
         envelope.Body = new Body();
-        envelope.Body.Content = xmlResponseData;
+        envelope.Body.Content = responseData;
 
         serializer.Serialize(xmlWriter, envelope, ns);
 
@@ -65,6 +64,4 @@ public class OutboundAccountsFunction(ILoggerFactory loggerFactory)
             System.Convert.ToBase64String(bytes),
             "application/xml"));
     }
-
-    
 }

@@ -53,7 +53,12 @@ jobs:
               -cpiCreateCustomerUrl $(cpiCreateCustomerUrl)
               -cpiAccessTokenUrl $(cpiAccessTokenUrl)
               -apimManagedIdentityId $(apimManagedIdentityId)
-              -customStorageName $(customStorageName)'
+              -customStorageName $(customStorageName)
+              -graphAudience $(graphAudience)
+              -graphAuthority $(graphAuthority)
+              -graphClientId $(graphClientId)
+              -graphClientSecret $(graphClientSecret)
+              -graphTenant $(graphTenant)'
 
             deploymentMode: $(deploymentMode)
             deploymentOutputs: 'deploymentOutputs'

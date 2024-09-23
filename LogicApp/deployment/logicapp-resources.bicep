@@ -30,6 +30,12 @@ param cpiCreateCustomerClientId string
 param cpiAccessTokenUrl string
 @secure()
 param cpiCreateCustomerClientSecret string
+param graphAudience string
+param graphAuthority string
+param graphClientId string
+@secure()
+param graphClientSecret string
+param graphTenant string
 
 // generic variables
 var ResourceGroup = resourceGroup().location
@@ -113,6 +119,11 @@ resource appSettings 'Microsoft.Web/sites/config@2022-09-01' = {
     CpiAccessTokenUrl: '@Microsoft.KeyVault(SecretUri=${vaultUri}secrets/CpiAccessTokenUrl/)'
     Dataverse_environment: dynamicsCrmEnvironmentUri
     CustomStorageTableConnectionString: '@Microsoft.KeyVault(SecretUri=${vaultUri}secrets/CustomStorageTableConnectionString/)'
+    GraphAudience: '@Microsoft.KeyVault(SecretUri=${vaultUri}secrets/GraphAudience/)'
+    GraphAuthority: '@Microsoft.KeyVault(SecretUri=${vaultUri}secrets/GraphAuthority/)'
+    GraphClientId: '@Microsoft.KeyVault(SecretUri=${vaultUri}secrets/GraphClientId/)'
+    GraphClientSecret: '@Microsoft.KeyVault(SecretUri=${vaultUri}secrets/GraphClientSecret/)'
+    GraphTenant: '@Microsoft.KeyVault(SecretUri=${vaultUri}secrets/GraphTenant/)'
   }
 }
 
@@ -256,6 +267,47 @@ resource cpiAccessTokenUrlSecret 'Microsoft.KeyVault/vaults/secrets@2021-11-01-p
   }
 }
 
+// key vault settings for graph api access
+resource graphAudienceSecret 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
+  parent: kv
+  name: 'GraphAudience'
+  properties: {
+    value: graphAudience
+  }
+}
+
+resource graphAuthoritySecret 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
+  parent: kv
+  name: 'GraphAuthority'
+  properties: {
+    value: graphAuthority
+  }
+}
+
+resource graphClientIdSecret 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
+  parent: kv
+  name: 'GraphClientId'
+  properties: {
+    value: graphClientId
+  }
+}
+
+resource graphClientSecretSecret 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
+  parent: kv
+  name: 'GraphClientSecret'
+  properties: {
+    value: graphClientSecret
+  }
+}
+
+resource graphTenantSecret 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
+  parent: kv
+  name: 'GraphTenant'
+  properties: {
+    value: graphTenant
+  }
+}
+
 // key vault rbac access setup
 @description('This is the built-in Key Vault Secret User role. See https://docs.microsoft.com/azure/role-based-access-control/built-in-roles#key-vault-secrets-user')
 resource keyVaultSecretUserRoleRoleDefinition 'Microsoft.Authorization/roleDefinitions@2018-01-01-preview' existing = {
@@ -295,6 +347,20 @@ resource keyVaultSecretUserRoleAssignmentApimManagedIdentity 'Microsoft.Authoriz
     principalType: 'ServicePrincipal'
   }
 }
+
+
+
+// grant access to ready user data
+// resource graphRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
+//   scope: resourceGroup()
+//   name: guid(subscription().id, 'Microsoft.Authorization', 'roleAssignments', 'graphRoleAssignment')
+//   properties: {
+//     principalId: logicApp.identity.principalId
+//     roleDefinitionId: '/providers/Microsoft.Authorization/roleDefinitions/18d7d88d-d35e-4fb5-a5c3-7773c20a72d9' // Role ID for User.Read.All
+    
+//   }
+// }
+
 
 output logicAppSystemAssignedIdentityTenantId string = subscription().tenantId
 output logicAppSystemAssignedIdentityObjectId string = reference(logicApp.id, '2019-08-01', 'full').identity.principalId

@@ -24,9 +24,24 @@ namespace RU_NO_CRM_Functions.Models.Factories.Outbound
 
         private static ZsiCmdSalesData[] CreateSalesDatas(OutboundAccountResponse res)
         {
-            //todo: check for data that needs to be mapped
-            return Array.Empty<ZsiCmdSalesData>();
+            var sd = new ZsiCmdSalesData
+            {
+                Spart = "00",
+                Vkorg = "2057",
+                Vtweg = "00",
+                Partners = new[]
+                {
+                    new ZsiCmdSalesPartner
+                    {
+                        Parvw = "ZS",
+                        Partner = res.SalesPerson
+                    }
+                }
+
+            };
+            return new []{ sd };
         }
+
 
         private static ZsiCmdCompanyData[] CreateCmdCompanyDatas(OutboundAccountResponse res)
         {
@@ -79,7 +94,7 @@ namespace RU_NO_CRM_Functions.Models.Factories.Outbound
                 {
                     Begdt = ConvertUtcDateTimeToDateString(res.AlcoholLicenseBeginDate),
                     Enddt = ConvertUtcDateTimeToDateString(res.AlcoholLicenseEndDate),
-                    Sttv = "",
+                    Sttv = res.AlcoholLicenseTypeId,
                     Sttv6 = ""  //todo: map to new field to store alcohol licence number
                 }
             };
