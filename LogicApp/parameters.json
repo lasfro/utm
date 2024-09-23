@@ -53,10 +53,6 @@
       "audience": "@appsetting('GraphAudience')",
       "clientId": "@appsetting('GraphClientId')",
       "secret": "@appsetting('GraphClientSecret')"
-    }
-      "type": "Raw",
-      "scheme": "Key",
-      "parameter": "@appsetting('sql-connectionKey')"
-    }
+    }      
   }
 }
