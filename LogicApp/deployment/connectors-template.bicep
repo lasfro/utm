@@ -1,19 +1,15 @@
 @description('The datacenter to use for the deployment.')
 param location string
-
 param commondataserviceName string
+
 param serviceBusName string
 param keyvaultName string
-param azuretablesName string
 param serviceBusResourceGroup string
 param sharedServiceBusName string
-param vnetName string
 param localKeyVaultName string
 
 param logicAppSystemAssignedIdentityTenantId string
 param logicAppSystemAssignedIdentityObjectId string
-
-param sa_name string = 'sa'
 
 @secure()
 param dynamicsCrmSecret string
@@ -21,11 +17,6 @@ param dynamicsCrmSecret string
 param dynamicsCrmClientId string
 param dynamicsCrmDirectoryId string
 
-// var storageName = concat(toLower(sa_name), uniqueString(resourceGroup().id))
-
-// resource storage 'Microsoft.Storage/storageAccounts@2019-06-01' existing = {
-//   name: storageName
-// }
 
 resource sb 'Microsoft.ServiceBus/namespaces@2021-11-01' existing = {
   name: sharedServiceBusName
@@ -131,6 +122,8 @@ resource commondataserviceName_logicAppSystemAssignedIdentityObjectId 'Microsoft
   }
 }
 
+
 output serviceBusConnectionRuntimeUrl string = serviceBusConnection.properties.connectionRuntimeUrl
 output keyvaultConnectionRuntimeUrl string = keyvaultConnection.properties.connectionRuntimeUrl
 output commondataserviceConnectionRuntimeUrl string = commondataservice.properties.connectionRuntimeUrl
+

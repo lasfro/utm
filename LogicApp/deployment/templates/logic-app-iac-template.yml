@@ -53,12 +53,16 @@ jobs:
               -cpiCreateCustomerUrl $(cpiCreateCustomerUrl)
               -cpiAccessTokenUrl $(cpiAccessTokenUrl)
               -apimManagedIdentityId $(apimManagedIdentityId)
+
               -customStorageName $(customStorageName)
               -graphAudience $(graphAudience)
               -graphAuthority $(graphAuthority)
               -graphClientId $(graphClientId)
               -graphClientSecret $(graphClientSecret)
-              -graphTenant $(graphTenant)'
+              -graphTenant $(graphTenant)
+              -sqlDatabaseName $(sqlDatabaseName)
+              -sqlServerName $(sqlServerName)'
+
 
             deploymentMode: $(deploymentMode)
             deploymentOutputs: 'deploymentOutputs'
@@ -95,10 +99,8 @@ jobs:
               -commondataserviceName $(commondataserviceName)
               -serviceBusResourceGroup $(serviceBusResourceGroup)
               -serviceBusName $(serviceBusName)
-              -sharedServiceBusName $(sharedServiceBusName)
-              -vnetName $(vnetName)
-              -keyvaultName $(keyvaultName)
-              -azuretablesName $(azuretablesName)
+              -sharedServiceBusName $(sharedServiceBusName)              
+              -keyvaultName $(keyvaultName)              
               -localKeyVaultName $(localKeyVaultName)
               -dynamicsCrmClientId $(dynamicsClientId)
               -dynamicsCrmSecret $(dynamicsSecret)
@@ -146,7 +148,7 @@ jobs:
             scriptType: 'bash'
             scriptLocation: 'inlineScript'
             inlineScript: |
-              az functionapp config appsettings set --name $(LAname) --resource-group  $(resourceGroupName) --settings WORKFLOWS_SERVICEBUS_CONNECTIONRUNTIME_URL=$(serviceBusConnectionRuntimeUrl) WORKFLOWS_KEYVAULT_CONNECTIONRUNTIME_URL=$(keyvaultConnectionRuntimeUrl) WORKFLOWS_COMMONDATASERVICE_CONNECTIONRUNTIME_URL=$(commondataserviceConnectionRuntimeUrl) 
+              az functionapp config appsettings set --name $(LAname) --resource-group  $(resourceGroupName) --settings WORKFLOWS_SERVICEBUS_CONNECTIONRUNTIME_URL=$(serviceBusConnectionRuntimeUrl) WORKFLOWS_KEYVAULT_CONNECTIONRUNTIME_URL=$(keyvaultConnectionRuntimeUrl) WORKFLOWS_COMMONDATASERVICE_CONNECTIONRUNTIME_URL=$(commondataserviceConnectionRuntimeUrl)
             #WORKFLOWS_AZURETABLES_CONNECTIONRUNTIME_URL=$(azuretablesConnectionRuntimeUrl) 
             addSpnToEnvironment: true
             useGlobalConfig: true

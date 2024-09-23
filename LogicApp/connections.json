@@ -19,23 +19,6 @@
       },
       "connectionRuntimeUrl": "@parameters('commondataservice-ConnectionRuntimeUrl')",
       "authentication": "@parameters('commondataservice-Authentication')"
-    },
-  
-    "sql-1": {
-      "api": {
-        "id": "/subscriptions/@{appsetting('WORKFLOWS_SUBSCRIPTION_ID')}/providers/Microsoft.Web/locations/@{appsetting('WORKFLOWS_LOCATION_NAME')}/managedApis/sql"
-      },
-      "connection": {
-        "id": "/subscriptions/@{appsetting('WORKFLOWS_SUBSCRIPTION_ID')}/resourceGroups/@{appsetting('WORKFLOWS_RESOURCE_GROUP_NAME')}/providers/Microsoft.Web/connections/sql-1"
-      },
-      "connectionRuntimeUrl": "@parameters('sql-1-ConnectionRuntimeUrl')",
-      "authentication": "@parameters('sql-1-Authentication')",
-      "connectionProperties": {
-        "authentication": {
-          "type": "ManagedServiceIdentity",
-          "audience": "https://database.windows.net/"
-        }
-      }
     }
   },
   "serviceProviderConnections": {
@@ -48,6 +31,16 @@
         "id": "/serviceProviders/azureTables"
       },
       "displayName": "azuretable"
+    },
+    "sql": {
+      "parameterValues": {
+        "connectionString": "@appsetting('sql_connectionString')"
+      },
+      "parameterSetName": "connectionString",
+      "serviceProvider": {
+        "id": "/serviceProviders/sql"
+      },
+      "displayName": "Local sql"
     }
   }
 }

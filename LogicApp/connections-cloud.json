@@ -22,6 +22,22 @@
         "id": "/serviceProviders/azuretables"
       },
       "displayName": "azuretables"
+    },
+    
+    "sql": {
+      "parameterValues": {
+        "managedIdentityType": "SystemAssigned",
+        "serverName": "@appsetting('sqlServerName')",
+        "databaseName": "@appsetting('sqlDatabaseName')",
+        "authProvider": {
+          "Type": "ManagedServiceIdentity"
+        }
+      },
+      "parameterSetName": "ManagedServiceIdentity",
+      "serviceProvider": {
+        "id": "/serviceProviders/sql"
+      },
+      "displayName": "SQL NO Core"
     }
   },
   "managedApiConnections": {
@@ -49,5 +65,9 @@
         "type": "ManagedServiceIdentity"
       }
     }
+  
+    
+
   }
+  
 }

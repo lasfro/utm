@@ -9,6 +9,9 @@ variables:
   - name: commondataserviceName
     value: 'commondataservice'
 
+  - name: sqlServerServiceName
+    value: 'sql'
+
   - name: serviceBusName
     value: 'servicebus'
 

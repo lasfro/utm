@@ -2,25 +2,9 @@
     "definition": {
         "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
         "actions": {
-            "Get_rows_(V2)": {
-                "type": "ApiConnection",
-                "inputs": {
-                    "host": {
-                        "connection": {
-                            "referenceName": "sql-1"
-                        }
-                    },
-                    "method": "get",
-                    "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('sql-no-core-dev.database.windows.net'))},@{encodeURIComponent(encodeURIComponent('Tradesolution'))}/tables/@{encodeURIComponent(encodeURIComponent('v_changed_crm_accounts'))}/items",
-                    "queries": {
-                        "$top": 1
-                    }
-                },
-                "runAfter": {}
-            },
             "For_each": {
                 "type": "Foreach",
-                "foreach": "@body('Get_rows_(V2)')?['value']",
+                "foreach": "@body('Get_rows')",
                 "actions": {
                     "Invoke_a_workflow_in_this_workflow_app": {
                         "type": "Workflow",
@@ -68,13 +52,50 @@
                             "Type": "@items('For_each')?['Type']",
                             "SalesChannel": "@items('For_each')?['SalesChannel']"
                         }
+                    },
+                    "Execute_stored_procedure_": {
+                        "type": "ServiceProvider",
+                        "inputs": {
+                            "parameters": {
+                                "storedProcedureName": "SP_UPSERT_CRM_ACCOUNT_HASH",
+                                "storedProcedureParameters": {
+                                    "TradesolutionId": "@{item()['TradesolutionId']}",
+                                    "Hash": "@{item()['Hash']}"
+                                },
+                                "includeEmptyResultSets": true
+                            },
+                            "serviceProviderConfiguration": {
+                                "connectionName": "sql",
+                                "operationId": "executeStoredProcedure",
+                                "serviceProviderId": "/serviceProviders/sql"
+                            }
+                        },
+                        "runAfter": {
+                            "Invoke_a_workflow_in_this_workflow_app": [
+                                "SUCCEEDED"
+                            ]
+                        }
                     }
                 },
                 "runAfter": {
-                    "Get_rows_(V2)": [
+                    "Get_rows": [
                         "SUCCEEDED"
                     ]
                 }
+            },
+            "Get_rows": {
+                "type": "ServiceProvider",
+                "inputs": {
+                    "parameters": {
+                        "tableName": "v_changed_crm_accounts"
+                    },
+                    "serviceProviderConfiguration": {
+                        "connectionName": "sql",
+                        "operationId": "getRows",
+                        "serviceProviderId": "/serviceProviders/sql"
+                    }
+                },
+                "runAfter": {}
             }
         },
         "contentVersion": "1.0.0.0",

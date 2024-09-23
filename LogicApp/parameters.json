@@ -42,19 +42,8 @@
       "scheme": "Key",
       "parameter": "@appsetting('commondataservice-connectionKey')"
     }
-  },
-  "sql-1-ConnectionRuntimeUrl": {
-    "type": "String",
-    "value": "@appsetting('sql-1-ConnectionRuntimeUrl')"
-  },
-  "sql-1-Authentication": {
-    "type": "Object",
-    "value": {
-      "type": "Raw",
-      "scheme": "Key",
-      "parameter": "@appsetting('sql-1-connectionKey')"
-    }
-  },
+  }
+  ,
   "graph-lookup-authentication": {
     "type": "Object",
     "value": {
@@ -64,6 +53,10 @@
       "audience": "@appsetting('GraphAudience')",
       "clientId": "@appsetting('GraphClientId')",
       "secret": "@appsetting('GraphClientSecret')"
+    }
+      "type": "Raw",
+      "scheme": "Key",
+      "parameter": "@appsetting('sql-connectionKey')"
     }
   }
 }
