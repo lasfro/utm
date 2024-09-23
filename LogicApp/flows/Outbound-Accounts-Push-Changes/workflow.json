@@ -115,7 +115,7 @@
                     "functionName": "MapOutboundAccountToSoap",
                     "parameters": {
                         "requestMessage": {
-                            "Account": "@body('Call_a_local_function_-_map_to_outbound_model')"
+                            "Account": "@outputs('Compose_-_set_EmployeeId')"
                         }
                     }
                 },

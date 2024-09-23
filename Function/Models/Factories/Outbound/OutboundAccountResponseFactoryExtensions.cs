@@ -24,19 +24,22 @@ namespace RU_NO_CRM_Functions.Models.Factories.Outbound
 
         private static ZsiCmdSalesData[] CreateSalesDatas(OutboundAccountResponse res)
         {
+            var partners = new List<ZsiCmdSalesPartner>();
+            if (!string.IsNullOrWhiteSpace(res.SalesPerson))
+            {
+                partners.Add(new ZsiCmdSalesPartner
+                {
+                    Parvw = "ZS",
+                    Partner = res.SalesPerson
+                });
+            }
+
             var sd = new ZsiCmdSalesData
             {
                 Spart = "00",
                 Vkorg = "2057",
                 Vtweg = "00",
-                Partners = new[]
-                {
-                    new ZsiCmdSalesPartner
-                    {
-                        Parvw = "ZS",
-                        Partner = res.SalesPerson
-                    }
-                }
+                Partners = partners.ToArray()
 
             };
             return new []{ sd };
@@ -105,16 +108,30 @@ namespace RU_NO_CRM_Functions.Models.Factories.Outbound
 
             if (!int.TryParse(res.TradesolutionLopenummer ?? "-1", out var tsLopenummerIntVal))
                 tsLopenummerIntVal = -1;
+            
+            // split GLN into parts
+            var bbbnr = "";
+            var bbsnr = "";
+            var bubkz = "";
+
+            if (res.GLN?.Trim().Length == 13)
+            {
+                bbbnr = res.GLN.Substring(0, 7);
+                bbsnr = res.GLN.Substring(7, 5);
+                bubkz = res.GLN.Substring(12, 1);
+            }
 
             return new CmdsEiVmdCentralData
             {
-                Bbbnr = res.GLN,
-                Bbsnr = res.GLN,
-                Bubkz = res.GLN,
+
+                Bbbnr = bbbnr,
+                Bbsnr = bbsnr,
+                Bubkz = bubkz,
                 Stceg = "NO" + res.VATRegistrationNumber ?? "",
                 Kukla = res.Category,
                 Vbund = "EXTERN",
-                Ktokd = "0001",
+                //Ktokd = "0001",
+                Ktokd = "ZNO1",
                 FonectaId = tsLopenummerIntVal
             };
         }
