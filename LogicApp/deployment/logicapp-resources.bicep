@@ -121,14 +121,14 @@ resource appSettings 'Microsoft.Web/sites/config@2022-09-01' = {
     CpiCreateCustomerUrl: '@Microsoft.KeyVault(SecretUri=${vaultUri}secrets/CpiCreateCustomerUrl/)'
     CpiAccessTokenUrl: '@Microsoft.KeyVault(SecretUri=${vaultUri}secrets/CpiAccessTokenUrl/)'
     Dataverse_environment: dynamicsCrmEnvironmentUri
-    CustomStorageTableConnectionString: '@Microsoft.KeyVault(SecretUri=${vaultUri}secrets/CustomStorageTableConnectionString/)
+    CustomStorageTableConnectionString: '@Microsoft.KeyVault(SecretUri=${vaultUri}secrets/CustomStorageTableConnectionString/)'
     GraphAudience: '@Microsoft.KeyVault(SecretUri=${vaultUri}secrets/GraphAudience/)'
     GraphAuthority: '@Microsoft.KeyVault(SecretUri=${vaultUri}secrets/GraphAuthority/)'
     GraphClientId: '@Microsoft.KeyVault(SecretUri=${vaultUri}secrets/GraphClientId/)'
     GraphClientSecret: '@Microsoft.KeyVault(SecretUri=${vaultUri}secrets/GraphClientSecret/)'
     GraphTenant: '@Microsoft.KeyVault(SecretUri=${vaultUri}secrets/GraphTenant/)'
     sqlServerName: sqlServerName
-    sqlDatabaseName: sqlDatabaseName'
+    sqlDatabaseName: sqlDatabaseName
   }
 }
 
