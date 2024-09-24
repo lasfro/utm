@@ -104,7 +104,7 @@
             "Recurrence": {
                 "type": "Recurrence",
                 "recurrence": {
-                    "interval": 3,
+                    "interval": 1,
                     "frequency": "Day"
                 },
                 "runtimeConfiguration": {

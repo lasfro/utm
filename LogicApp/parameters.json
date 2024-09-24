@@ -42,8 +42,7 @@
       "scheme": "Key",
       "parameter": "@appsetting('commondataservice-connectionKey')"
     }
-  }
-  ,
+  },
   "graph-lookup-authentication": {
     "type": "Object",
     "value": {
@@ -53,6 +52,6 @@
       "audience": "@appsetting('GraphAudience')",
       "clientId": "@appsetting('GraphClientId')",
       "secret": "@appsetting('GraphClientSecret')"
-    }      
+    }
   }
 }
