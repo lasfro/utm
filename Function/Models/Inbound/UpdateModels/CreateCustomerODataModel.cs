@@ -25,9 +25,9 @@ public record CreateCustomerODataModel
     public string? address1_telephone1 { get; set; }
     public string? address1_telephone2 { get; set; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public int address1_addresstypecode { get; set; }
+    public int? address1_addresstypecode { get; set; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public int address2_addresstypecode { get; set; }
+    public int? address2_addresstypecode { get; set; }
     public decimal? address2_latitude { get; set; }
     public string? address2_stateorprovince { get; set; }
     public string? address2_line1 { get; set; }
@@ -54,7 +54,8 @@ public record CreateCustomerODataModel
     public string? accountnumber { get; set; }
     public string? hbb_member_number { get; set; }
     public string? hbb_organisasjonsnummer { get; set; }
-    public int statuscode { get; set; }
+    public CrmCustomerStatusReason statuscode { get; set; }
     public string? telephone2 { get; set; }
     public CrmCustomerType? hbb_type { get; set; }
+    public CrmSalesChannel? hbb_customer_saleschannel { get; set; }
 }

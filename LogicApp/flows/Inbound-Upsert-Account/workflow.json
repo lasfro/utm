@@ -366,10 +366,29 @@
                                     "statusCode": 201
                                 },
                                 "runAfter": {
-                                    "Add_a_new_row_(preview)": [
+                                    "Invoke_a_workflow_to_set_proposed_sales_rep": [
                                         "SUCCEEDED"
                                     ]
                                 }
+                            },
+                            "Invoke_a_workflow_to_set_proposed_sales_rep": {
+                                "type": "Workflow",
+                                "inputs": {
+                                    "host": {
+                                        "workflow": {
+                                            "id": "Inbound_Propose_And_Set_Sales_Representative"
+                                        }
+                                    },
+                                    "body": {
+                                        "customerguid": "@{body('Add_a_new_row_(preview)')?['accountid']}"
+                                    }
+                                },
+                                "runAfter": {
+                                    "Add_a_new_row_(preview)": [
+                                        "SUCCEEDED"
+                                    ]
+                                },
+                                "operationOptions": "DisableAsyncPattern"
                             }
                         }
                     }

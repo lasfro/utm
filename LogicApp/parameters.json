@@ -53,5 +53,57 @@
       "clientId": "@appsetting('GraphClientId')",
       "secret": "@appsetting('GraphClientSecret')"
     }
+  },
+  "DynamicsApplicationId": {
+    "type": "String",
+    "value": "a4d8d1e3-6e5c-e811-a954-000d3ab204d5"
+  },
+  "office365-ConnectionRuntimeUrl": {
+    "type": "String",
+    "value": "@appsetting('office365-ConnectionRuntimeUrl')"
+  },
+  "office365-Authentication": {
+    "type": "Object",
+    "value": {
+      "type": "Raw",
+      "scheme": "Key",
+      "parameter": "@appsetting('office365-connectionKey')"
+    }
+  },
+  "office365users-ConnectionRuntimeUrl": {
+    "type": "String",
+    "value": "@appsetting('office365users-ConnectionRuntimeUrl')"
+  },
+  "office365users-Authentication": {
+    "type": "Object",
+    "value": {
+      "type": "Raw",
+      "scheme": "Key",
+      "parameter": "@appsetting('office365users-connectionKey')"
+    }
+  },
+  "commondataservice-1-ConnectionRuntimeUrl": {
+    "type": "String",
+    "value": "@appsetting('commondataservice-1-ConnectionRuntimeUrl')"
+  },
+  "commondataservice-1-Authentication": {
+    "type": "Object",
+    "value": {
+      "type": "Raw",
+      "scheme": "Key",
+      "parameter": "@appsetting('commondataservice-1-connectionKey')"
+    }
+  },
+  "commondataservice-2-ConnectionRuntimeUrl": {
+    "type": "String",
+    "value": "@appsetting('commondataservice-2-ConnectionRuntimeUrl')"
+  },
+  "commondataservice-2-Authentication": {
+    "type": "Object",
+    "value": {
+      "type": "Raw",
+      "scheme": "Key",
+      "parameter": "@appsetting('commondataservice-2-connectionKey')"
+    }
   }
 }

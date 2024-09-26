@@ -19,6 +19,46 @@
       },
       "connectionRuntimeUrl": "@parameters('commondataservice-ConnectionRuntimeUrl')",
       "authentication": "@parameters('commondataservice-Authentication')"
+    },
+    "office365": {
+      "api": {
+        "id": "/subscriptions/@{appsetting('WORKFLOWS_SUBSCRIPTION_ID')}/providers/Microsoft.Web/locations/@{appsetting('WORKFLOWS_LOCATION_NAME')}/managedApis/office365"
+      },
+      "connection": {
+        "id": "/subscriptions/@{appsetting('WORKFLOWS_SUBSCRIPTION_ID')}/resourceGroups/@{appsetting('WORKFLOWS_RESOURCE_GROUP_NAME')}/providers/Microsoft.Web/connections/office365-1"
+      },
+      "connectionRuntimeUrl": "@parameters('office365-ConnectionRuntimeUrl')",
+      "authentication": "@parameters('office365-Authentication')"
+    },
+    "office365users": {
+      "api": {
+        "id": "/subscriptions/@{appsetting('WORKFLOWS_SUBSCRIPTION_ID')}/providers/Microsoft.Web/locations/@{appsetting('WORKFLOWS_LOCATION_NAME')}/managedApis/office365users"
+      },
+      "connection": {
+        "id": "/subscriptions/@{appsetting('WORKFLOWS_SUBSCRIPTION_ID')}/resourceGroups/@{appsetting('WORKFLOWS_RESOURCE_GROUP_NAME')}/providers/Microsoft.Web/connections/office365users"
+      },
+      "connectionRuntimeUrl": "@parameters('office365users-ConnectionRuntimeUrl')",
+      "authentication": "@parameters('office365users-Authentication')"
+    },
+    "commondataservice-1": {
+      "api": {
+        "id": "/subscriptions/@{appsetting('WORKFLOWS_SUBSCRIPTION_ID')}/providers/Microsoft.Web/locations/@{appsetting('WORKFLOWS_LOCATION_NAME')}/managedApis/commondataservice"
+      },
+      "connection": {
+        "id": "/subscriptions/@{appsetting('WORKFLOWS_SUBSCRIPTION_ID')}/resourceGroups/@{appsetting('WORKFLOWS_RESOURCE_GROUP_NAME')}/providers/Microsoft.Web/connections/commondataservice-1"
+      },
+      "connectionRuntimeUrl": "@parameters('commondataservice-1-ConnectionRuntimeUrl')",
+      "authentication": "@parameters('commondataservice-1-Authentication')"
+    },
+    "commondataservice-2": {
+      "api": {
+        "id": "/subscriptions/@{appsetting('WORKFLOWS_SUBSCRIPTION_ID')}/providers/Microsoft.Web/locations/@{appsetting('WORKFLOWS_LOCATION_NAME')}/managedApis/commondataservice"
+      },
+      "connection": {
+        "id": "/subscriptions/@{appsetting('WORKFLOWS_SUBSCRIPTION_ID')}/resourceGroups/@{appsetting('WORKFLOWS_RESOURCE_GROUP_NAME')}/providers/Microsoft.Web/connections/commondataservice-2"
+      },
+      "connectionRuntimeUrl": "@parameters('commondataservice-2-ConnectionRuntimeUrl')",
+      "authentication": "@parameters('commondataservice-2-Authentication')"
     }
   },
   "serviceProviderConnections": {

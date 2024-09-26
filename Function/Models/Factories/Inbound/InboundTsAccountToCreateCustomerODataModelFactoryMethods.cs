@@ -42,25 +42,26 @@ namespace RU_NO_CRM_Functions.Models.Factories.Inbound
                 //telephone2 = account.Telephone2,
                 accountnumber = account.BankAccountNumber,
                 //address1_primarycontactname = account.PrimaryContactName,
-                description = "",
+                description = account.Description,
                 hbb_wholesalerodatabind = null, // need a mapping here and change odata bind serialization name
                 //emailaddress1 = account.Email,
                 hbb_invoice_mail = account.InvoiceEmail,
                 name = account.Name,
-                statuscode = GetInitialStatusCodeForAccount(account)
+                statuscode = GetInitialStatusCodeForAccount(account),
+                hbb_customer_saleschannel = GetInitialSalesChannelForAccount(account)
 
                 // todo: visiting address (should we add it?)
             };
         }
 
-        private static int GetInitialStatusCodeForAccount(InboundAccountTradeSolution account)
+        private static CrmCustomerStatusReason GetInitialStatusCodeForAccount(InboundAccountTradeSolution account)
         {
             var salesChannel = account.SalesChannel?.ToLower() ?? "";
 
             if (salesChannel is "off-trade" or "kbs")
-                return 1;// status = Active
+                return CrmCustomerStatusReason.ReadyForSAPCreation_02;// status = Active
 
-            return 861580005;  // status = 14 Considered for follow up
+            return CrmCustomerStatusReason.ProspectConsiderToFollowUp_14;  // status = 14 Considered for follow up
         }
 
         private static CrmCustomerType GetInitialCrmCustomerTypeForAccount(InboundAccountTradeSolution account)
@@ -72,6 +73,21 @@ namespace RU_NO_CRM_Functions.Models.Factories.Inbound
 
             return CrmCustomerType.Prospect;
         }
+
+         private static CrmSalesChannel GetInitialSalesChannelForAccount(InboundAccountTradeSolution account)
+        {
+            var salesChannel = account.SalesChannel?.ToLower() ?? "";
+
+            if (salesChannel is "off-trade")
+                return CrmSalesChannel.OffTrade;
+            if (salesChannel is "on-trade")
+                return CrmSalesChannel.OnTrade;
+            if (salesChannel is "kbs")
+                return CrmSalesChannel.KBS;               
+
+            return CrmSalesChannel.Other;  
+        }
+
 
     }
 }

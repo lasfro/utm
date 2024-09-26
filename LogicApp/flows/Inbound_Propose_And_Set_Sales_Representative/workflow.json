@@ -1,0 +1,280 @@
+{
+    "definition": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "actions": {
+            "Get_a_row_by_ID": {
+                "type": "ApiConnection",
+                "inputs": {
+                    "host": {
+                        "connection": {
+                            "referenceName": "commondataservice"
+                        }
+                    },
+                    "method": "get",
+                    "headers": {
+                        "prefer": "odata.include-annotations=*",
+                        "accept": "application/json;odata.metadata=full",
+                        "organization": "@parameters('Dataverse_environment')"
+                    },
+                    "path": "/api/data/v9.1/@{encodeURIComponent(encodeURIComponent('accounts'))}(@{encodeURIComponent(encodeURIComponent(triggerBody()['customerguid']))})"
+                },
+                "runAfter": {}
+            },
+            "Condition": {
+                "type": "If",
+                "expression": {
+                    "or": [
+                        {
+                            "equals": [
+                                "@body('Get_a_row_by_ID')?['hbb_customer_saleschannel']",
+                                861580001
+                            ]
+                        },
+                        {
+                            "equals": [
+                                "@body('Get_a_row_by_ID')?['hbb_customer_saleschannel']",
+                                861580002
+                            ]
+                        }
+                    ]
+                },
+                "actions": {
+                    "Scope": {
+                        "type": "Scope",
+                        "actions": {
+                            "List_customers_within_same_area": {
+                                "type": "ApiConnection",
+                                "inputs": {
+                                    "host": {
+                                        "connection": {
+                                            "referenceName": "commondataservice"
+                                        }
+                                    },
+                                    "method": "get",
+                                    "headers": {
+                                        "prefer": "odata.include-annotations=*",
+                                        "accept": "application/json;odata.metadata=full",
+                                        "organization": "@parameters('Dataverse_environment')"
+                                    },
+                                    "path": "/api/data/v9.1/@{encodeURIComponent(encodeURIComponent('accounts'))}",
+                                    "queries": {
+                                        "$filter": "address1_postalcode gt '@{variables('PostalcodeRangeFrom')}' and address1_postalcode lt '@{variables('PostalcodeRangeTo')}' and ownerid ne null and statecode eq 0 and statuscode  eq 1 and hbb_type eq 2 and (hbb_customer_saleschannel eq 861580001 or hbb_customer_saleschannel eq 861580002)",
+                                        "$expand": "owninguser($select=fullname,internalemailaddress)",
+                                        "$top": 1
+                                    }
+                                }
+                            },
+                            "For_each": {
+                                "type": "foreach",
+                                "foreach": "@body('List_customers_within_same_area')?['value']",
+                                "actions": {
+                                    "Set_sales_representative_as_suggested_on_customer": {
+                                        "type": "ApiConnection",
+                                        "inputs": {
+                                            "host": {
+                                                "connection": {
+                                                    "referenceName": "commondataservice"
+                                                }
+                                            },
+                                            "method": "patch",
+                                            "body": {
+                                                "ownerid@odata.bind": "systemusers(@{items('For_each')?['_owninguser_value']})"
+                                            },
+                                            "headers": {
+                                                "prefer": "return=representation,odata.include-annotations=*",
+                                                "accept": "application/json;odata.metadata=full",
+                                                "organization": "@parameters('Dataverse_environment')"
+                                            },
+                                            "path": "/api/data/v9.1/@{encodeURIComponent(encodeURIComponent('accounts'))}(@{encodeURIComponent(encodeURIComponent(body('Get_a_row_by_ID')?['accountid']))})"
+                                        }
+                                    },
+                                    "Send_an_email_to_inform_stakeholders_on_proposed_sales_representative": {
+                                        "type": "ApiConnection",
+                                        "inputs": {
+                                            "host": {
+                                                "connection": {
+                                                    "referenceName": "office365"
+                                                }
+                                            },
+                                            "method": "post",
+                                            "body": {
+                                                "To": "frode.lastad@royalunibrew.com",
+                                                "Subject": "Kunde @{body('Get_a_row_by_ID')?['name']}med SAP kundenummer @{body('Get_a_row_by_ID')?['hbb_sapkundenummer']} er opprettet. ",
+                                                "Body": "<p class=\"editor-paragraph\">Hei,</p><p class=\"editor-paragraph\">Vi har opprettet kunden @{body('Get_a_row_by_ID')?['name']} og foreslår at @{item()?['owninguser']?['fullname']} følger opp denne kunden basert på andre kunder i nærheten. Dersom dette ikke stemmer kan eier endres ved å følge lenken under.</p><p class=\"editor-paragraph\">@{concat(parameters('Dataverse_environment'), '/main.aspx?appid=',parameters('DynamicsApplicationId'),'&pagetype=entityrecord&etn=account&id=', body('Get_a_row_by_ID')?['accountid'])}</p>",
+                                                "Importance": "Normal"
+                                            },
+                                            "path": "/v2/Mail"
+                                        },
+                                        "runAfter": {
+                                            "Get_manager_for_sales_rep": [
+                                                "SUCCEEDED"
+                                            ]
+                                        }
+                                    },
+                                    "Get_manager_for_sales_rep": {
+                                        "type": "ApiConnection",
+                                        "inputs": {
+                                            "host": {
+                                                "connection": {
+                                                    "referenceName": "office365users"
+                                                }
+                                            },
+                                            "method": "get",
+                                            "path": "/codeless/v1.0/users/@{encodeURIComponent(outputs('Compose'))}/manager"
+                                        },
+                                        "runAfter": {
+                                            "Compose": [
+                                                "SUCCEEDED"
+                                            ]
+                                        }
+                                    },
+                                    "Compose": {
+                                        "type": "Compose",
+                                        "inputs": "@item()?['owninguser']?['internalemailaddress']",
+                                        "runAfter": {
+                                            "Set_sales_representative_as_suggested_on_customer": [
+                                                "SUCCEEDED"
+                                            ]
+                                        }
+                                    }
+                                },
+                                "runAfter": {
+                                    "List_customers_within_same_area": [
+                                        "SUCCEEDED"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "Response_Success": {
+                        "type": "Response",
+                        "kind": "Http",
+                        "inputs": {
+                            "statusCode": 200,
+                            "body": {
+                                "ReponseMessage": "Owner successfully set"
+                            },
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "ResponseMessage": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        },
+                        "runAfter": {
+                            "Scope": [
+                                "SUCCEEDED"
+                            ]
+                        },
+                        "operationOptions": "Asynchronous"
+                    },
+                    "Response_Failed": {
+                        "type": "Response",
+                        "kind": "Http",
+                        "inputs": {
+                            "statusCode": 500,
+                            "body": {
+                                "ReponseMessage": "Failed to set owner"
+                            },
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "ResponseMessage": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        },
+                        "runAfter": {
+                            "Scope": [
+                                "FAILED"
+                            ]
+                        },
+                        "operationOptions": "Asynchronous"
+                    }
+                },
+                "else": {
+                    "actions": {
+                        "Response": {
+                            "type": "Response",
+                            "kind": "Http",
+                            "inputs": {
+                                "statusCode": 200,
+                                "body": {
+                                    "ResponseMessage": "Not a recognised off-trade/kbs customer. Proposal for setting sales rep on new customer is only applicable for Off-trade and KBS customers) "
+                                },
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ResponseMessage": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            },
+                            "operationOptions": "Asynchronous"
+                        }
+                    }
+                },
+                "runAfter": {
+                    "Initialize_variable_PostalCodeRangeTo": [
+                        "SUCCEEDED"
+                    ]
+                }
+            },
+            "Initialize_variable_PostalCodeRangeFrom": {
+                "type": "InitializeVariable",
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "PostalcodeRangeFrom",
+                            "type": "string",
+                            "value": "@string(sub(int(body('Get_a_row_by_ID')?['address1_postalcode']),50))"
+                        }
+                    ]
+                },
+                "runAfter": {
+                    "Get_a_row_by_ID": [
+                        "SUCCEEDED"
+                    ]
+                }
+            },
+            "Initialize_variable_PostalCodeRangeTo": {
+                "type": "InitializeVariable",
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "PostalcodeRangeTo",
+                            "type": "string",
+                            "value": "@string(add(int(body('Get_a_row_by_ID')?['address1_postalcode']),50))"
+                        }
+                    ]
+                },
+                "runAfter": {
+                    "Initialize_variable_PostalCodeRangeFrom": [
+                        "SUCCEEDED"
+                    ]
+                }
+            }
+        },
+        "contentVersion": "1.0.0.0",
+        "outputs": {},
+        "triggers": {
+            "When_a_HTTP_request_is_received": {
+                "type": "Request",
+                "kind": "Http",
+                "inputs": {
+                    "method": "POST",
+                    "schema": {
+                        "customerguid": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "kind": "Stateful"
+}
